@@ -1,7 +1,6 @@
 from __future__ import print_function, division
 
 import numpy as np
-# import mkl
 
 from time import time
 from itertools import product
@@ -10,9 +9,6 @@ from multiprocessing import cpu_count
 from scipy.ndimage.interpolation import zoom
 from tensor_sc import online_DL, solve_l1
 from sklearn.feature_extraction.image import extract_patches
-
-# import numbers
-# from numpy.lib.stride_tricks import as_strided
 
 
 def upsampler_3D(data, variance=None, block_size=(3,3,3), block_up=(5,5,5),
