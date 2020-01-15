@@ -1,72 +1,16 @@
 import numpy as np
-# import mkl
 
 from time import time
 from itertools import cycle, product
 from sklearn.utils import gen_batches
 from sklearn.linear_model import MultiTaskLassoCV
-# from sklearn.utils import shuffle as shuffler
 
 from joblib import Parallel, delayed
 from multiprocessing import get_context, cpu_count
 
 from tqdm import tqdm
 
-from enet import lasso_path, lasso_crossval  # select_best_path,
-
-# https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/linear_model/coordinate_descent.py
-
-
-# # See p. 4 of https://web.stanford.edu/~hastie/Papers/multi_response.pdf
-def multilasso(X, y, lbda, beta_init=0, eps=1e-5, maxiter=1000, intercept=False, progressbar=True, random=True):
-
-    if lbda <= 0:
-        raise ValueError('lambda needs to be strictly positive, but is {}'.format(lbda))
-
-    if intercept:
-        X = X - np.mean(X, axis=1, keepdims=True)
-        y = y - np.mean(y, axis=1, keepdims=True)
-
-    beta = np.zeros((X.shape[0], y.shape[1]))
-    beta_prev = np.zeros_like(beta)
-
-    R = y - np.dot(X, beta_init)
-    Rk = np.zeros_like(R)
-
-    if progressbar:
-        maxiter = tqdm(maxiter)
-
-    for _ in range(maxiter):
-
-        ranger = range(X.shape[1])
-
-        if random:
-            ranger = list(ranger)
-            np.random.shuffle(ranger)
-
-        for k in ranger:
-
-            # step 2a
-            Rk[:] = R + np.sum(X[:, k] * beta[k])
-
-            # step 2b
-            XtRk = np.dot(X[:, k].T, Rk)
-            norm2_XtRk = np.linalg.norm2(XtRk)
-
-            if norm2_XtRk < lbda:
-                beta[k] = 0
-            else:
-                beta[k] = 1 / np.sum(X[:, k]**2) * (1 - lbda / norm2_XtRk) * XtRk
-
-            # step 2c
-                R[:] = Rk - np.dot(X[:, k], beta[k])
-
-        if np.abs(beta - beta_prev).max() < eps:
-            break
-
-        beta_prev[:] = beta
-
-    return beta
+from enet import lasso_path, lasso_crossval
 
 
 def update_D(D, A, B, X, niter=1, eps=1e-15, positivity=False):
@@ -123,76 +67,25 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=None, posi
     if variance is None:
         variance = [None] * alpha.shape[1]
 
-    # mkl.set_num_threads(1)
+    Xhat = np.zeros((alpha.shape[1], D.shape[0]), dtype=np.float32)
+    intercept = np.zeros((alpha.shape[1], 1), dtype=np.float32)
+    lbda = np.zeros((alpha.shape[1], 1), dtype=np.float32)
 
-    multipredict = False
-    if multipredict:
-        # try out the multitask lasso
-        reg = MultiTaskLassoCV(cv=5,
-                               eps=1e-5,
-                               verbose=False,
-                               normalize=standardize,
-                               fit_intercept=fit_intercept,
-                               n_jobs=ncores,
-                               selection='random')
-
-        reg.fit(D, X.T)
-
-        Xhat = reg.predict(D)
-        alpha = reg.coefs_
-        intercept = reg.intercept_
-        lbda = reg.alpha_ * np.ones_like(intercept)
-
-        if return_all:
-            return Xhat, alpha, intercept, lbda
-
-        if return_alpha:
-            return alpha
-
+    if use_joblib:
+        batch_size = alpha.shape[1] // (10 * ncores)
+        stuff = Parallel(n_jobs=ncores,
+                         pre_dispatch='all',
+                         batch_size=batch_size,
+                         verbose=5)(delayed(lasso_path_parallel)(D,
+                                                                 X[i],
+                                                                 nlambdas=nlambdas,
+                                                                 positivity=positivity,
+                                                                 variance=variance[i],
+                                                                 fit_intercept=fit_intercept,
+                                                                 standardize=standardize,
+                                                                 use_crossval=use_crossval) for i in range(alpha.shape[1]))
     else:
-
-        Xhat = np.zeros((alpha.shape[1], D.shape[0]), dtype=np.float32)
-        intercept = np.zeros((alpha.shape[1], 1), dtype=np.float32)
-        lbda = np.zeros((alpha.shape[1], 1), dtype=np.float32)
-
-        # use_joblib = True
-
-        if use_joblib:
-            # tt = time()
-            batch_size = alpha.shape[1] // (10 * ncores)
-            stuff = Parallel(n_jobs=ncores,
-                             pre_dispatch='all',
-                             batch_size=batch_size,
-                             verbose=5)(delayed(lasso_path_parallel)(D,
-                                                                     X[i],
-                                                                     nlambdas=nlambdas,
-                                                                     positivity=positivity,
-                                                                     variance=variance[i],
-                                                                     fit_intercept=fit_intercept,
-                                                                     standardize=standardize,
-                                                                     use_crossval=use_crossval) for i in range(alpha.shape[1]))
-            # print('time was {}'.format(time() - tt))
-        else:
-            arglist = [(D,
-                        X[i],
-                        nlambdas,
-                        positivity,
-                        variance[i],
-                        fit_intercept,
-                        standardize,
-                        use_crossval)
-                       for i in range(alpha.shape[1])]
-
-            if progressbar:
-                arglist = tqdm(arglist)
-            # tt = time()
-            if pool is None:
-                with get_context(method=method).Pool(processes=ncores) as pool:
-                    stuff = pool.starmap(lasso_path_parallel, arglist)
-            else:
-                stuff = pool.starmap(lasso_path_parallel, arglist)
-            # print('time was {}'.format(time() - tt))
-            del arglist
+        raise ValueError('Only joblib path is supported now.')
 
     for i, content in enumerate(stuff):
         Xhat[i], alpha[:, i], intercept[i], lbda[i] = content
@@ -211,7 +104,6 @@ def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3
 
     tt = time()
     seen_patches = 0
-    # obj_prev = 1e300
 
     if n_atoms is None:
         n_atoms = 2 * np.prod(X.shape[1:])
@@ -229,7 +121,6 @@ def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3
 
     # Put to unit l2 norm, will also copy D if we passed it to the function
     D = D / np.sqrt(np.sum(D**2, axis=1, keepdims=True))
-    # D_old = np.copy(D)
 
     A = np.eye(D.shape[1]) * t0
     B = t0 * D
@@ -255,13 +146,6 @@ def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3
         batches = cycle(gen_batches(X.shape[0], batchsize))
         iterator = zip(range(1, niter + 1), batches)
 
-    # create pool, we reuse it across iteration to save speed and close it at the end
-    # if disable_mkl:
-    #     mkl.set_num_threads(1)
-
-    pool = get_context(method=method).Pool(processes=ncores)
-    loss = np.zeros(niter, dtype=np.float32)
-
     for t, batch in tqdm(iterator, total=niter):
 
         cutter = X[batch].shape[0]
@@ -270,7 +154,7 @@ def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3
 
         x[:] = X[batch].reshape(batchsize, -1)
         _, _, _, lbda = solve_l1(x, D, alpha, positivity=positivity, ncores=ncores, nlambdas=nlambdas, variance=variance, return_all=True,
-                                 fit_intercept=fit_intercept, standardize=standardize, pool=pool, use_joblib=use_joblib, method=method,
+                                 fit_intercept=fit_intercept, standardize=standardize, use_joblib=use_joblib, method=method,
                                  progressbar=progressbar)
 
         np.dot(alpha, alpha.T, out=alpha_alpha_T)
@@ -290,17 +174,6 @@ def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3
 
         update_D(D, A, B, X, positivity=False)
 
-        # seems like we enter a loop where column are swapped, maybe check the quality of reconstruction in l2 norm
-        # over a few iterations instead?
-        # obj =
-        # if nothing changed in D, then declare convergence
-        # if np.abs(D_old - D).sum() / np.abs(D_old).sum()  < eps:
-        #     print(np.abs(D_old - D).sum(), np.abs(D_old - D).sum() / np.abs(D_old).sum(), t, 'converged!')
-        #     break
-        # else:
-        #     print(np.abs(D_old - D).sum(), np.abs(D_old - D).sum() / np.abs(D_old).sum(), t)
-        #     D_old[:] = D
-
         # reset past information every two full epochs
         if seen_patches > 2 * X.shape[0]:
             A[:] = A_prime
@@ -312,16 +185,6 @@ def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3
             seen_patches = 0
         else:
             seen_patches += batchsize
-
-        loss[t - 1] = np.mean(0.5 * np.sum((x.T - np.dot(D, alpha))**2) + lbda * np.abs(alpha).sum())
-        # loss[t-1] = np.mean(np.abs(alpha != 0).sum())
-
-        if saveback is not None:
-            np.save(saveback, D)
-            np.save(saveback.replace('.npy', '_l2loss.npy'), loss)
-
-    pool.close()
-    pool.join()
 
     print('total {}'.format(time() - tt))
     return D
