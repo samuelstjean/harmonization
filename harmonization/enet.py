@@ -1,7 +1,7 @@
 import numpy as np
 
 import warnings
-from _glmnet import elnet, multelnet
+from harmonization._glmnet import elnet
 
 from sklearn.model_selection import KFold
 

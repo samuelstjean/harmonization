@@ -4,18 +4,14 @@ import numpy as np
 
 from time import time
 from itertools import product
-from multiprocessing import cpu_count
 
 from scipy.ndimage.interpolation import zoom
-from tensor_sc import online_DL, solve_l1
+from harmonization.tensor_sc import online_DL, solve_l1
 from sklearn.feature_extraction.image import extract_patches
 
 
 def upsampler_3D(data, variance=None, block_size=(3,3,3), block_up=(5,5,5),
-                 mask=None, dtype=np.float64, ncores=None, params=None):
-
-    if ncores is None:
-        ncores = cpu_count()
+                 mask=None, dtype=np.float64, ncores=-1, params=None):
 
     factor = np.array(block_up) / np.array(block_size)[:-1]
 

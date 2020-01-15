@@ -2,15 +2,12 @@ import numpy as np
 
 from time import time
 from itertools import cycle, product
-from sklearn.utils import gen_batches
-from sklearn.linear_model import MultiTaskLassoCV
 
 from joblib import Parallel, delayed
-from multiprocessing import get_context, cpu_count
-
 from tqdm import tqdm
 
-from enet import lasso_path, lasso_crossval
+from sklearn.utils import gen_batches
+from harmonization.enet import lasso_path, lasso_crossval
 
 
 def update_D(D, A, B, X, niter=1, eps=1e-15, positivity=False):
@@ -52,17 +49,14 @@ def lasso_path_parallel(D, X, nlambdas, positivity=False, variance=None, fit_int
     return Xhat, alpha, intercept, lbda
 
 
-def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=None, positivity=False, variance=None, fit_intercept=True, standardize=True,
-             progressbar=True, pool=None, use_joblib=False, method='fork', multipredict=False, use_crossval=False):
+def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positivity=False, variance=None, fit_intercept=True, standardize=True,
+             progressbar=True, pool=None, use_joblib=False, use_crossval=False, verbose=5, pre_dispatch='all'):
 
     if alpha is None:
         return_alpha = True
         alpha = np.zeros((D.shape[1], X.shape[0]))
     else:
         return_alpha = False
-
-    if ncores is None:
-        ncores = cpu_count()
 
     if variance is None:
         variance = [None] * alpha.shape[1]
@@ -72,18 +66,16 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=None, posi
     lbda = np.zeros((alpha.shape[1], 1), dtype=np.float32)
 
     if use_joblib:
-        batch_size = alpha.shape[1] // (10 * ncores)
         stuff = Parallel(n_jobs=ncores,
-                         pre_dispatch='all',
-                         batch_size=batch_size,
-                         verbose=5)(delayed(lasso_path_parallel)(D,
-                                                                 X[i],
-                                                                 nlambdas=nlambdas,
-                                                                 positivity=positivity,
-                                                                 variance=variance[i],
-                                                                 fit_intercept=fit_intercept,
-                                                                 standardize=standardize,
-                                                                 use_crossval=use_crossval) for i in range(alpha.shape[1]))
+                         pre_dispatch=pre_dispatch,
+                         verbose=verbose)(delayed(lasso_path_parallel)(D,
+                                                                       X[i],
+                                                                       nlambdas=nlambdas,
+                                                                       positivity=positivity,
+                                                                       variance=variance[i],
+                                                                       fit_intercept=fit_intercept,
+                                                                       standardize=standardize,
+                                                                       use_crossval=use_crossval) for i in range(alpha.shape[1]))
     else:
         raise ValueError('Only joblib path is supported now.')
 
@@ -98,7 +90,7 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=None, posi
 
 
 def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3, variance=None,
-              shuffle=True, fulldraw=False, positivity=False, fit_intercept=True, standardize=True, ncores=None, nlambdas=100,
+              shuffle=True, fulldraw=False, positivity=False, fit_intercept=True, standardize=True, ncores=-1, nlambdas=100,
               progressbar=True, disable_mkl=True, saveback=None, use_joblib=False, method='fork',
               eps=1e-6):
 
@@ -110,9 +102,6 @@ def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3
 
     if n_atoms > X.shape[0]:
         n_atoms = X.shape[0]
-
-    if ncores is None:
-        ncores = cpu_count()
 
     if D is None:
         # we pick n_atoms indexes along each dimensions randomly
