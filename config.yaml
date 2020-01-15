@@ -1,0 +1,27 @@
+path: '/user/alberto/Samuel/TO_HARMONIZE'
+outpath: '/user/samuel/Samuel/TO_HARMONIZE'
+outfilename: 'belgium_norway.npy'
+
+dataname: '*_FP.nii'
+maskname: '_brain_mask.nii.gz'
+bval: '.bval'
+bvec: '.bvec'
+
+glob: True
+block_size: '3, 3, 3, 5'
+block_up: '3, 3, 3, 5'
+use_std: False
+positivity: False
+fit_intercept: True
+center: True
+
+# bias_correct_std: False
+fix_mean: False
+use_crossval: False
+
+split_b0s: True
+b0_threshold: 20
+batchsize: 32
+niter: 1500
+
+ncores: 100 # None = uses everything in this case
