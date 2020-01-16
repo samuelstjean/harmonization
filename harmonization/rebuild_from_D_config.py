@@ -8,129 +8,13 @@ import nibabel as nib
 
 from itertools import cycle
 from ast import literal_eval
-from time import time
 from glob import iglob
 
-from harmonization.D_upsampler import depimp_zoom, reconstruct_from_blocks
-from harmonization.tensor_sc import solve_l1
+
 from harmonization.config import get_arguments
 
 from nlsam.angular_tools import angular_neighbors
 from nlsam.denoiser import greedy_set_finder
-
-from sklearn.feature_extraction.image import extract_patches
-
-
-def rebuild(data, mask, D, block_size, block_up, ncores=-1,
-            positivity=False, variance=None, fix_mean=True, fit_intercept=False, use_crossval=False):
-
-    data = data * mask[..., None]
-
-    if len(block_size) == len(block_up):
-        last = block_up[-1]
-    else:
-        last = block_size[-1]
-
-    factor = np.divide(block_up, block_size)
-    new_shape = (int(data.shape[0] * factor[0]),
-                 int(data.shape[1] * factor[1]),
-                 int(data.shape[2] * factor[2]),
-                 last)
-    overlap = (1, 1, 1, last)
-    new_overlap = overlap
-    print(new_shape, new_overlap, factor)
-
-    if block_size == block_up:
-        D_depimpe = np.copy(D)
-    else:
-        D_depimpe = depimp_zoom(D, block_size, block_up, zoomarray=False)
-
-    blocks = extract_patches(data, block_size, overlap).reshape(-1, np.prod(block_size))
-    del data
-    # original_shape = blocks.shape
-
-    # # check if recon is correct / only reconstruct old school way from the blocks to be on the safe side maybe?
-    # recon = reconstruct_from_blocks(blocks, new_shape, block_size, block_up[:-1], new_overlap, weights=None)
-    # return recon
-
-    # blocks = np.asarray(blocks).reshape(-1, np.prod(block_size))
-
-    # get the variance as blocks
-    if variance is not None:
-        variance *= mask
-        print(variance.shape)
-        variance = extract_patches(variance, block_size[:-1], overlap[:-1])
-        print(variance.shape)
-        # axis = list(range(variance.ndim//2, variance.ndim))
-        # variance = np.median(variance, axis=axis)
-        # print(variance.shape, np.prod(block_size[:-1]), np.prod(block_size), np.prod(variance.shape))
-        variance = np.asarray(variance).reshape(-1, np.prod(block_size[:-1]))
-        print(variance.shape)
-    # skip empty rows from training since they are probably masked background
-    mask = blocks.sum(axis=1) > np.prod(block_size) // 2
-
-    if variance is not None:
-        variance = np.median(variance, axis=-1)
-
-        # if we are on an edge, variance can be 0, so truncate those cases as well
-        np.logical_and(mask, variance > 0, out=mask)
-        variance = variance[mask]
-        print(variance.shape, np.sum(variance == 0))
-
-    print(blocks.shape)
-    blocks = blocks[mask]
-    print(blocks.shape, D.shape, D_depimpe.shape, mask.shape, block_size, block_up, new_shape, new_overlap, 'pre l1 stuff')
-
-    # if center:
-    #     blocks_mean = blocks.mean(axis=1, keepdims=True)
-    #     blocks -= blocks_mean
-    tt = time()
-    X_small_denoised, alpha, intercept, _ = solve_l1(blocks, D_depimpe, variance=variance, return_all=True, nlambdas=100, use_joblib=True,
-                                                     positivity=positivity, fit_intercept=True, standardize=True, progressbar=True,
-                                                     method='fork', ncores=ncores, use_crossval=use_crossval)
-
-    print(X_small_denoised.shape, D_depimpe.shape, alpha.shape, intercept.shape)
-    # print(np.min(alpha), np.max(alpha), np.abs(alpha).min(), np.abs(alpha).max())
-    # print(np.min(intercept), np.max(intercept), np.abs(intercept).min(), np.abs(intercept).max())
-    print('total time was {}'.format(time() - tt))
-    # if fix_mean:
-    #     mean = blocks.mean(axis=1)
-    # else:
-    #     mean = None
-
-    # if center:
-    #     intercept += blocks_mean
-
-    # # reconstructor = None  # should we put block_up from the original?
-    # tt = time()
-    # recon = reconstruct_from_indexes(alpha, D, intercept, new_shape, new_overlap, mask, block_size, block_up)  #
-    # print('reconstruction took {}'.format(time() - tt))
-    # return recon
-
-    # we actually only want alpha and intercept in this step and throw out X if we do upsampling normally
-    # for ease of use reason, we now use directly X for the reconstruction, but we should
-    # 1. multiply back X
-    # 2a. feed X in an empty array with a mask
-    #
-    #   OR
-    #
-    # 2b. reconstruct the array and average things internally according to a mask
-
-    tt = time()
-    X_final = np.zeros(((mask.shape[0],) + block_up), dtype=np.float32)
-
-    if block_size != block_up:
-        X_small_denoised = np.dot(D, alpha).T + intercept
-
-    print('multiply time was {}'.format(time() - tt))
-    tt = time()
-
-    X_final[mask] = X_small_denoised.reshape(-1, *block_up)
-    recon = reconstruct_from_blocks(X_final, new_shape, block_size, block_up[:-1], new_overlap, weights=None)
-    print('recon time was {}'.format(time() - tt))
-
-    del X_final, mask
-    return recon
 
 
 def main():

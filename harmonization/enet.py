@@ -1,9 +1,10 @@
-import numpy as np
+from __future__ import print_function, division
 
+import numpy as np
 import warnings
-from harmonization._glmnet import elnet
 
 from sklearn.model_selection import KFold
+from harmonization._glmnet import elnet
 
 
 def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
