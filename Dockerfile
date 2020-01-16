@@ -6,7 +6,7 @@ ENV DEPENDS='cython==0.29 nibabel==2.4 dipy==0.15 numpy==1.16.4 scipy==1.2.2 sci
     nlsam_version='0.6.1'
 
 RUN apt update && \
-    apt install libopenblas-base libgfortran3 -y --no-install-recommends && \
+    apt install libopenblas-base gfortran -y --no-install-recommends && \
     apt autoclean && \
     # get python deps
     pip3 install --no-cache-dir $DEPENDS $DEPENDS_spams && \
