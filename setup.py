@@ -4,7 +4,7 @@ from numpy.distutils.core import Extension, setup
 with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
-f_sources = ['harmonization/glmnet/glmnet.f']
+f_sources = ['glmnet/glmnet.f']
 
 fflags = ['-fdefault-real-8',
           '-ffixed-form',
