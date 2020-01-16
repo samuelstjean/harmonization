@@ -16,7 +16,7 @@ from itertools import cycle
 
 from nlsam.angular_tools import angular_neighbors
 from nlsam.denoiser import greedy_set_finder
-from create_config import get_arguments
+from create_config import get_arguments, write_config
 from tensor_sc import online_DL
 
 
@@ -181,6 +181,15 @@ def main():
         sys.exit(1)
 
     config = sys.argv[1]
+
+    if len(sys.argv) == 3:
+        path = sys.argv[2]
+        if config == 'write':
+            write_config(path)
+        else:
+            error = 'You need to pass the keyword [write] as an argument followed by a filename to write the default config, but you passed {}'.format(sys.argv[1:])
+            raise ValueError(error)
+
     kwargs = get_arguments(config)
 
     # we need to do a few special things for some args

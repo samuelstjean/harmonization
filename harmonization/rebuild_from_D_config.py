@@ -2,38 +2,27 @@ from __future__ import print_function, division
 
 import sys
 import os
-# import yaml
-from glob import iglob
-# import warnings
 
 import numpy as np
 import nibabel as nib
 
 from itertools import cycle
-from multiprocessing import cpu_count
 from ast import literal_eval
 from time import time
+from glob import iglob
 
-from D_upsampler import depimp_zoom, reconstruct_from_blocks  # reconstruct_from_indexes
-from tensor_sc import solve_l1
-# from patch_D import get_indexer
-from create_config import get_arguments
+from harmonization.D_upsampler import depimp_zoom, reconstruct_from_blocks
+from harmonization.tensor_sc import solve_l1
+from harmonization.config import get_arguments
 
-# from nlsam.stabilizer import corrected_sigma
-# from nlsam.bias_correction import root_finder_sigma
 from nlsam.angular_tools import angular_neighbors
 from nlsam.denoiser import greedy_set_finder
 
 from sklearn.feature_extraction.image import extract_patches
 
 
-def rebuild(data, mask, D, block_size, block_up, ncores=None,
+def rebuild(data, mask, D, block_size, block_up, ncores=-1,
             positivity=False, variance=None, fix_mean=True, fit_intercept=False, use_crossval=False):
-
-    if ncores is None:
-        ncores = cpu_count()
-    elif ncores > cpu_count():
-        ncores = cpu_count()
 
     data = data * mask[..., None]
 
