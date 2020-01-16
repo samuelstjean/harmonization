@@ -4,4 +4,4 @@ include README.md
 include CHANGELOG.md
 include Dockerfile
 include config.yaml
-include harmonization/glmnet/glmnet.f
+include glmnet/glmnet.f
