@@ -3,7 +3,6 @@ from __future__ import print_function, division
 import numpy as np
 
 from itertools import product
-
 from scipy.ndimage.interpolation import zoom
 
 
