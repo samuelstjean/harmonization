@@ -110,8 +110,6 @@ def depimp_zoom(D, block_size, block_up, order=1):
         factor = block_size[:-1] / block_up
         zoomer = (*factor, 1, 1)
 
-    # if we have a 4D block array and different last dimension, subsample it
-    # if (len(block_up) == len(block_size)) and (block_up[-1] != block_size[-1]):
     size = tuple(block_up)
 
     if (len(block_up) - 1) == len(block_size):
@@ -126,13 +124,11 @@ def depimp_zoom(D, block_size, block_up, order=1):
 def reconstruct_from_indexes(alpha, D, intercept, new_shape, new_overlap, mask,
                              block_size, block_up, small_recon=None, patch_mean=None):
 
-    if len(block_size) == len(block_up):
-        factor = np.divide(block_up, block_size)
-        last = (block_up[-1],)
-        block_up = block_up[:-1]
-    else:
-        last = (block_size[-1],)
-        factor = tuple(np.divide(block_up, block_size[:-1])) + last
+    if len(block_size) != len(block_up):
+        raise ValueError('Length of the blocks size is not matching {} {}'.format(block_size, block_up))
+
+    last = (block_up[-1],)
+    block_up = block_up[:-1]
 
     i_h, i_w, i_l = new_shape[:3]
     p_h, p_w, p_l = block_up
@@ -182,7 +178,6 @@ def reconstruct_from_indexes(alpha, D, intercept, new_shape, new_overlap, mask,
 
     p = 0
     weights = 1
-    print(stuff.shape, D.shape, alpha.shape, 'stuff')
 
     for idx, (i, j, k) in enumerate(ijk):
         if mask[idx]:
