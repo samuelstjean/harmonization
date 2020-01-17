@@ -4,6 +4,9 @@ from numpy.distutils.core import Extension, setup
 with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
+with open('requirements.txt') as f:
+    install_requires = f.read().splitlines()
+
 f_sources = ['glmnet/glmnet.f']
 
 fflags = ['-fdefault-real-8',
@@ -29,6 +32,6 @@ setup(
     description='Implementation of "Harmonization of diffusion MRI datasets with adaptive dictionary learning".',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    install_requires=['numpy>=1.15'],
+    install_requires=install_requires,
     ext_modules=[module],
 )
