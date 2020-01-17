@@ -8,7 +8,11 @@ from itertools import cycle
 from ast import literal_eval
 from time import time
 
-from sklearn.feature_extraction.image import extract_patches
+# It's a private function in 0.24 now
+try:
+    from sklearn.feature_extraction.image import _extract_patches as extract_patches
+except ImportError:
+    from sklearn.feature_extraction.image import extract_patches
 
 from nlsam.angular_tools import angular_neighbors
 from nlsam.denoiser import greedy_set_finder
@@ -142,11 +146,11 @@ def get_global_D(datasets, outfilename, block_size, ncores=None, batchsize=32, n
     else:
         variance_large = None
 
-    savename = 'Dic_' + outfilename + '_size_{}.npy'.format(block_size).replace(' ', '')
+    # savename = 'Dic_' + outfilename + '_size_{}.npy'.format(block_size).replace(' ', '')
 
     D = online_DL(train_data, ncores=ncores, positivity=positivity, fit_intercept=fit_intercept, standardize=True,
                   nlambdas=100, niter=niter, batchsize=batchsize, n_atoms=n_atoms, variance=variance_large,
-                  progressbar=True, disable_mkl=True, saveback=savename, use_joblib=False)
+                  progressbar=True, use_joblib=True)
 
     return D
 

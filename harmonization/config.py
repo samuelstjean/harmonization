@@ -40,8 +40,8 @@ batchsize: 32
 niter: 1500
 
 # ncores can be a positive or negative number, which indicates the number of cores to use or to leave free respectively.
-# If it is None or -1, all cores will be used
-ncores: 100
+# ncores = -1 will use all cores
+ncores: -1
 """
 
 
