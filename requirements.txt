@@ -1,6 +1,6 @@
 numpy>=1.15
 scipy>=0.19
-yaml>=3.12
+pyyaml>=5.1
 nibabel>=2.4
 sklearn>=0.21
 joblib>=0.14.1

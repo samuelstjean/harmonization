@@ -24,7 +24,7 @@ def get_global_D(datasets, outfilename, block_size, ncores=None, batchsize=32, n
     # get the data shape so we can preallocate some arrays
     # we also have to assume all datasets have the same 3D shape obviously
     shape = nib.load(datasets[0]['data']).header.get_data_shape()
-    current_block_size = block_size
+    current_block_size = literal_eval(block_size)
 
     n_atoms = int(np.prod(current_block_size) * 2)
     b0_block_size = tuple(current_block_size[:-1]) + ((current_block_size[-1] + 1,))
@@ -237,19 +237,19 @@ def harmonize_my_data(dataset, kwargs):
     block_size = literal_eval(kwargs['block_size'])
     positivity = kwargs['positivity']
     fit_intercept = kwargs['fit_intercept']
-    center = kwargs['center']
     fix_mean = kwargs['fix_mean']
     use_crossval = kwargs['use_crossval']
     split_b0s = kwargs['split_b0s']
     b0_threshold = kwargs['b0_threshold']
     ncores = kwargs['ncores']
+    ext = kwargs['ext']
 
     print('Now rebuilding {}'.format(dataset['data']))
     D = np.load(path_D)
     predicted_D = path_D.replace('.npy', '')
 
-    output_filename = dataset['data'].replace('.nii', '_predicted_' + predicted_D + '.nii.gz')
-    output_filename = output_filename.replace('.nii.gz', '_recon.nii.gz')
+    output_filename = dataset['data'].replace(ext, '_predicted_' + predicted_D + ext)
+    output_filename = output_filename.replace(ext, '_recon' + ext)
     output_filename = os.path.join(outpath, os.path.basename(output_filename))
 
     if os.path.isfile(output_filename):

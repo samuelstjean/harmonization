@@ -1,15 +1,17 @@
-path: '/user/alberto/Samuel/TO_HARMONIZE'
-outpath: '/user/samuel/Samuel/TO_HARMONIZE'
-outfilename: 'belgium_norway.npy'
 
+path: /user/alberto/Samuel/TO_HARMONIZE
+outpath: /user/samuel/Samuel/TO_HARMONIZE
+outfilename: belgium_norway.npy
+
+# Globbing is allowed, but it needs to be a quoted string
 dataname: '*_FP.nii'
-maskname: '_brain_mask.nii.gz'
-bval: '.bval'
-bvec: '.bvec'
+maskname: _brain_mask.nii.gz
+bval: .bval
+bvec: .bvec
 
 glob: True
-block_size: '3, 3, 3, 5'
-block_up: '3, 3, 3, 5'
+block_size: 3, 3, 3, 5
+block_up: 3, 3, 3, 5
 use_std: False
 positivity: False
 fit_intercept: True

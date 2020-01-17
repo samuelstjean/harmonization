@@ -5,19 +5,16 @@ from __future__ import print_function, division
 import sys
 import os
 
-from glob import iglob
-from ast import literal_eval
-
 import numpy as np
 
-from harmonization.config import read_config, write_config
+from harmonization.config import read_config, write_config, get_filenames
 from harmonization.dictionary import get_global_D
 
 
 def main():
 
     if len(sys.argv) == 1:
-        usage = 'Usage : everything is set in config.yaml, that is the only input'
+        usage = 'Usage : everything is set in config.yaml, that is the only input.'
         print(usage)
         sys.exit(1)
 
@@ -27,6 +24,8 @@ def main():
         path = sys.argv[2]
         if config == 'write':
             write_config(path)
+            print('Default config written at {}'.format(os.path.abspath(path)))
+            sys.exit(1)
         else:
             error = 'You need to pass the keyword [write] as an argument followed by a filename to write the default config, but you passed {}'.format(sys.argv[1:])
             raise ValueError(error)
@@ -37,31 +36,8 @@ def main():
     path = kwargs.pop('path')
     use_glob = kwargs.pop('glob')
     outfilename = kwargs.pop('outfilename')
-    kwargs['block_size'] = literal_eval(kwargs['block_size'])
 
-    # Guess the filenames for all of our data
-    datasets = []
-    if use_glob:
-        files = os.path.join(path, kwargs['dataname'])
-        for name in iglob(files):
-            dataset = {'data': name,
-                       'mask': name.replace('.nii', kwargs['maskname']),
-                       'bval': name.replace('.nii', kwargs['bval']),
-                       'bvec': name.replace('.nii', kwargs['bvec'])}
-
-            datasets += [dataset]
-    else:
-
-        for root, dirs, files in os.walk(path):
-            dirs.sort()
-            for name in files:
-                if name == kwargs['dataname']:
-                    dataset = {'data': os.path.join(root, kwargs['dataname']),
-                               'mask': os.path.join(root, kwargs['maskname']),
-                               'bval': os.path.join(root, kwargs['bval']),
-                               'bvec': os.path.join(root, kwargs['bvec'])}
-
-                    datasets += [dataset]
+    datasets = get_filenames(path, use_glob)
 
     D = get_global_D(datasets, outfilename, **kwargs)
     np.save(outfilename, D)
