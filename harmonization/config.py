@@ -86,4 +86,7 @@ def get_filenames(path, use_glob, kwargs):
 
                     datasets += [dataset]
 
+    if len(datasets) == 0:
+        raise ValueError('No datasets found with the given config file at {}'.format(path))
+
     return datasets
