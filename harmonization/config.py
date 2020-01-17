@@ -4,7 +4,8 @@ import yaml
 
 
 # This huge string is dumped directly to a text file, creating the default config as is
-default_config = """path: '/user/alberto/Samuel/TO_HARMONIZE'
+default_config = """
+path: '/user/alberto/Samuel/TO_HARMONIZE'
 outpath: '/user/samuel/Samuel/TO_HARMONIZE'
 outfilename: 'belgium_norway.npy'
 
@@ -39,7 +40,7 @@ def write_config(filename):
         yaml_file.write(default_config)
 
 
-def get_arguments(filename):
+def read_config(filename):
     with open(filename, "r") as yaml_file:
         yaml_content = yaml.safe_load(yaml_file)
     return yaml_content

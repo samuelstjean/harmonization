@@ -13,9 +13,8 @@ from sklearn.feature_extraction.image import extract_patches
 from nlsam.angular_tools import angular_neighbors
 from nlsam.denoiser import greedy_set_finder
 
-from harmonization.tensor_sc import online_DL
+from harmonization.solver import online_DL, solve_l1
 from harmonization.recon import depimp_zoom, reconstruct_from_blocks
-from harmonization.tensor_sc import solve_l1
 
 
 def get_global_D(datasets, outfilename, block_size, ncores=None, batchsize=32, niter=500,

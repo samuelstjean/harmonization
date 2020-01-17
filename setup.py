@@ -23,7 +23,7 @@ setup(
     author='Samuel St-Jean',
     author_email='samuel@isi.uu.nl',
     packages=find_packages(),
-    # scripts=['scripts/dpr', 'scripts/dpr_make_fancy_graph'],
+    scripts=['scripts/harmonization_build_dictionary', 'scripts/harmonization_from_dictionary'],
     url='https://github.com/samuelstjean/harmonization',
     license='GPL2',
     description='Implementation of "Harmonization of diffusion MRI datasets with adaptive dictionary learning".',
