@@ -7,7 +7,7 @@ from glob import iglob
 
 # This huge string is dumped directly to a text file, creating the default config as is
 default_config = """
-# Paths can be relative or absolute, but they need to exist
+# Paths can be relative or absolute, but they need to already be created
 path: /user/alberto/Samuel/TO_HARMONIZE
 outpath: /user/samuel/Samuel/TO_HARMONIZE
 outfilename: belgium_norway.npy
@@ -17,9 +17,11 @@ glob: True
 dataname: '*_FP.nii'
 
 # If we glob, the extension of dataname is replaced to create the filenames of the remaining files
+# If not, the filename needs to be supplied and will be loaded from the same folder as the data
 maskname: _brain_mask.nii.gz
 bval: .bval
 bvec: .bvec
+
 
 block_size: 3, 3, 3, 5
 block_up: 3, 3, 3, 5
@@ -37,7 +39,9 @@ b0_threshold: 20
 batchsize: 32
 niter: 1500
 
-ncores: 100 # None = uses everything in this case
+# ncores can be a positive or negative number, which indicates the number of cores to use or to leave free respectively.
+# If it is None or -1, all cores will be used
+ncores: 100
 """
 
 

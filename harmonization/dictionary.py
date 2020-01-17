@@ -252,6 +252,10 @@ def harmonize_my_data(dataset, kwargs):
     output_filename = output_filename.replace(ext, '_recon' + ext)
     output_filename = os.path.join(outpath, os.path.basename(output_filename))
 
+    # Create subfolders tree if it does not exist
+    if not os.path.exists(os.path.dirname(output_filename)):
+        os.makedirs(outpath, exist_ok=True)
+
     if os.path.isfile(output_filename):
         print('File already exists! Skipping {}'.format(output_filename))
     else:
