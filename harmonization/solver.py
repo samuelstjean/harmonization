@@ -68,6 +68,7 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
     lbda = np.zeros((alpha.shape[1], 1), dtype=np.float32)
 
     if use_joblib:
+        print(ncores)
         stuff = Parallel(n_jobs=ncores,
                          pre_dispatch=pre_dispatch,
                          verbose=verbose)(delayed(lasso_path_parallel)(D,
