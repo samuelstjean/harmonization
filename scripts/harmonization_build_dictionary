@@ -14,7 +14,7 @@ from harmonization.dictionary import get_global_D
 def main():
 
     if len(sys.argv) == 1:
-        usage = 'Usage : everything is set in config.yaml, that is the only input.'
+        usage = 'Usage : everything is set in config.yaml, that is the only input.\nTo create a default config, pass write /path/to/file/config.yaml to create a template example'
         print(usage)
         sys.exit(1)
 
@@ -37,7 +37,7 @@ def main():
     use_glob = kwargs.pop('glob')
     outfilename = kwargs.pop('outfilename')
 
-    datasets = get_filenames(path, use_glob)
+    datasets = get_filenames(path, use_glob, kwargs)
 
     D = get_global_D(datasets, outfilename, **kwargs)
     np.save(outfilename, D)

@@ -21,7 +21,7 @@ def main():
     path = kwargs.pop('path')
     use_glob = kwargs.pop('glob')
 
-    datasets = get_filenames(path, use_glob)
+    datasets = get_filenames(path, use_glob, kwargs)
 
     # Actually harmonize each dataset by itself
     for dataset in datasets:
