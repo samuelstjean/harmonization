@@ -6,7 +6,7 @@ from itertools import product
 
 from scipy.ndimage.interpolation import zoom
 from sklearn.feature_extraction.image import extract_patches
-from harmonization.tensor_sc import online_DL, solve_l1
+from harmonization.solver import online_DL, solve_l1
 
 
 def upsampler_3D(data, variance=None, block_size=(3,3,3), block_up=(5,5,5),

@@ -9,7 +9,7 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 
 from sklearn.utils import gen_batches
-from harmonization.enet import lasso_path, lasso_crossval
+from harmonization.elastic_net import lasso_path, lasso_crossval
 
 
 def update_D(D, A, B, X, niter=1, eps=1e-15, positivity=False):
