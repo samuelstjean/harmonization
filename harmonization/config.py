@@ -1,22 +1,28 @@
 from __future__ import print_function, division
 
+import os
 import yaml
 
+from glob import iglob
 
 # This huge string is dumped directly to a text file, creating the default config as is
 default_config = """
-path: '/user/alberto/Samuel/TO_HARMONIZE'
-outpath: '/user/samuel/Samuel/TO_HARMONIZE'
-outfilename: 'belgium_norway.npy'
+# Paths can be relative or absolute, but they need to exist
+path: /user/alberto/Samuel/TO_HARMONIZE
+outpath: /user/samuel/Samuel/TO_HARMONIZE
+outfilename: belgium_norway.npy
 
-dataname: '*_FP.nii'
-maskname: '_brain_mask.nii.gz'
-bval: '.bval'
-bvec: '.bvec'
-
+# If globbing is allowed, a star expression needs to be a quoted string or it crashes the reader
 glob: True
-block_size: '3, 3, 3, 5'
-block_up: '3, 3, 3, 5'
+dataname: '*_FP.nii'
+
+# If we glob, the extension of dataname is replaced to create the filenames of the remaining files
+maskname: _brain_mask.nii.gz
+bval: .bval
+bvec: .bvec
+
+block_size: 3, 3, 3, 5
+block_up: 3, 3, 3, 5
 use_std: False
 positivity: False
 fit_intercept: True
@@ -44,3 +50,36 @@ def read_config(filename):
     with open(filename, "r") as yaml_file:
         yaml_content = yaml.safe_load(yaml_file)
     return yaml_content
+
+
+def get_filenames(path, use_glob, kwargs):
+    datasets = []
+
+    if kwargs['dataname'][-7:] == '.nii.gz':
+        kwargs['ext'] = '.nii.gz'
+    else:
+        kwargs['ext'] = os.path.splitext(kwargs['dataname'])[1]
+
+    # Build the list of all datasets and supporting files
+    if use_glob:
+        files = os.path.join(path, kwargs['dataname'])
+        for name in iglob(files):
+            dataset = {'data': name,
+                       'mask': name.replace(kwargs['ext'], kwargs['maskname']),
+                       'bval': name.replace(kwargs['ext'], kwargs['bval']),
+                       'bvec': name.replace(kwargs['ext'], kwargs['bvec'])}
+
+            datasets += [dataset]
+    else:
+        for root, dirs, files in os.walk(path):
+            dirs.sort()
+            for name in files:
+                if name == kwargs['dataname']:
+                    dataset = {'data': os.path.join(root, kwargs['dataname']),
+                               'mask': os.path.join(root, kwargs['maskname']),
+                               'bval': os.path.join(root, kwargs['bval']),
+                               'bvec': os.path.join(root, kwargs['bvec'])}
+
+                    datasets += [dataset]
+
+    return datasets

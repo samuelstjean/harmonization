@@ -3,11 +3,8 @@
 from __future__ import print_function, division
 
 import sys
-import os
 
-from glob import iglob
-
-from harmonization.config import read_config
+from harmonization.config import read_config, get_filenames
 from harmonization.dictionary import harmonize_my_data
 
 
@@ -24,29 +21,7 @@ def main():
     path = kwargs.pop('path')
     use_glob = kwargs.pop('glob')
 
-    datasets = []
-
-    # Build the list of all datasets and supporting files
-    if use_glob:
-        files = os.path.join(path, kwargs['dataname'])
-        for name in iglob(files):
-            dataset = {'data': name,
-                       'mask': name.replace('.nii', kwargs['maskname']),
-                       'bval': name.replace('.nii', kwargs['bval']),
-                       'bvec': name.replace('.nii', kwargs['bvec'])}
-
-            datasets += [dataset]
-    else:
-        for root, dirs, files in os.walk(path):
-            dirs.sort()
-            for name in files:
-                if name == kwargs['dataname']:
-                    filename = os.path.join(root, name)
-                    dataset = {'data': filename,
-                               'mask': filename.replace('.nii', kwargs['maskname']),
-                               'bval': filename.replace('.nii', kwargs['bval']),
-                               'bvec': filename.replace('.nii', kwargs['bvec'])}
-                    datasets += [dataset]
+    datasets = get_filenames(path, use_glob)
 
     # Actually harmonize each dataset by itself
     for dataset in datasets:
