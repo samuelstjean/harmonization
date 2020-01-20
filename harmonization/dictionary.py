@@ -352,7 +352,6 @@ def harmonize_my_data(dataset, kwargs):
             divider[list(b0_loc + idx)] += 1
 
             print('Now rebuilding volumes {} / block {} out of {}.'.format(b0_loc + idx, i, len(indexes)))
-            break
             predicted[..., b0_loc + idx] += rebuild(to_denoise,
                                                     mask,
                                                     D,
