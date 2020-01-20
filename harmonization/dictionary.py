@@ -197,11 +197,9 @@ def rebuild(data, mask, D, block_size, block_up, ncores=-1,
         np.logical_and(mask, variance > 0, out=mask)
         variance = variance[mask]
 
-    # blocks = blocks[mask]
+    blocks = blocks[mask]
 
     tt = time()
-    # ensure fortran order for blocks to avoid copying
-    blocks = np.array(blocks[mask], copy=True, dtype=np.float64, order='F')
     X_small_denoised, alpha, intercept, _ = solve_l1(blocks, D_depimpe, variance=variance, return_all=True, nlambdas=100, use_joblib=True,
                                                      positivity=positivity, fit_intercept=True, standardize=True, progressbar=True,
                                                      ncores=ncores, use_crossval=use_crossval)
@@ -354,6 +352,7 @@ def harmonize_my_data(dataset, kwargs):
             divider[list(b0_loc + idx)] += 1
 
             print('Now rebuilding volumes {} / block {} out of {}.'.format(b0_loc + idx, i, len(indexes)))
+            break
             predicted[..., b0_loc + idx] += rebuild(to_denoise,
                                                     mask,
                                                     D,
@@ -369,6 +368,8 @@ def harmonize_my_data(dataset, kwargs):
         predicted /= divider
 
         if center:
+            print(mask.shape, predicted.shape, data_mean.shape)
+            print(predicted[mask].shape)
             predicted[mask] += data_mean
 
         # clip negatives, which happens at the borders

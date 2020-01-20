@@ -67,8 +67,6 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
     intercept = np.zeros((alpha.shape[1], 1), dtype=np.float32)
     lbda = np.zeros((alpha.shape[1], 1), dtype=np.float32)
 
-    # D = np.array(D, copy=True, dtype=np.float64, order='F')
-
     arglist = ((D,
                 X[i],
                 nlambdas,
