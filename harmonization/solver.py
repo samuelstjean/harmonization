@@ -67,16 +67,18 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
     intercept = np.zeros((alpha.shape[1], 1), dtype=np.float32)
     lbda = np.zeros((alpha.shape[1], 1), dtype=np.float32)
 
+    arglist = ((D,
+                X[i],
+                nlambdas,
+                positivity,
+                variance[i],
+                fit_intercept,
+                standardize,
+                use_crossval) for i in range(alpha.shape[1]))
+
     if use_joblib:
         stuff = Parallel(n_jobs=ncores,
-                         pre_dispatch=pre_dispatch)(delayed(lasso_path_parallel)(D,
-                                                                                 X[i],
-                                                                                 nlambdas=nlambdas,
-                                                                                 positivity=positivity,
-                                                                                 variance=variance[i],
-                                                                                 fit_intercept=fit_intercept,
-                                                                                 standardize=standardize,
-                                                                                 use_crossval=use_crossval) for i in range(alpha.shape[1]))
+                         pre_dispatch=pre_dispatch)(delayed(lasso_path_parallel)(*args) for args in arglist)
     else:
         raise ValueError('Only joblib path is supported now.')
 
@@ -143,7 +145,7 @@ def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3
 
         x[:] = X[batch].reshape(batchsize, -1)
         _, _, _, lbda = solve_l1(x, D, alpha, positivity=positivity, ncores=ncores, nlambdas=nlambdas, variance=variance, return_all=True,
-                                 fit_intercept=fit_intercept, standardize=standardize, use_joblib=use_joblib, progressbar=progressbar)
+                                 fit_intercept=fit_intercept, standardize=standardize, use_joblib=use_joblib, progressbar=False)
 
         np.dot(alpha, alpha.T, out=alpha_alpha_T)
         # x is transposed with regards to original notation
