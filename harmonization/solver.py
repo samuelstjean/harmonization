@@ -82,7 +82,7 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
         arglist = tqdm(arglist, total=X.shape[0])
 
     if use_joblib:
-        stuff = Parallel(n_jobs=ncores)(delayed(lasso_path_parallel)(*args) for args in arglist)
+        stuff = Parallel(n_jobs=ncores, pre_dispatch=pre_dispatch)(delayed(lasso_path_parallel)(*args) for args in arglist)
     else:
         raise ValueError('Only joblib path is supported now.')
 
