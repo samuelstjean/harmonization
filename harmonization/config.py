@@ -5,23 +5,24 @@ import yaml
 
 from glob import iglob
 
+
 # This huge string is dumped directly to a text file, creating the default config as is
 default_config = """
-# Paths can be relative or absolute, but they need to already be created
-path: /user/alberto/Samuel/TO_HARMONIZE
-outpath: /user/samuel/Samuel/TO_HARMONIZE
-outfilename: belgium_norway.npy
+# Paths can be relative or absolute, but the root needs to already be created
+# Any subfolder (i.e. each subject has its own folder) will be created accordingly
+path: /root/path/to/all/my/data
+outpath: /output/path/to//my/new/data
+outfilename: harmonization_dictionary.npy
 
 # If globbing is allowed, a star expression needs to be a quoted string or it crashes the reader
 glob: True
-dataname: '*_FP.nii'
+dataname: '*_.nii.gz'
 
 # If we glob, the extension of dataname is replaced to create the filenames of the remaining files
 # If not, the filename needs to be supplied and will be loaded from the same folder as the data
-maskname: _brain_mask.nii.gz
 bval: .bval
 bvec: .bvec
-
+maskname: _brain_mask.nii.gz
 
 block_size: 3, 3, 3, 5
 block_up: 3, 3, 3, 5

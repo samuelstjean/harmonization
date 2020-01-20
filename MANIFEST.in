@@ -3,4 +3,6 @@ include LICENSE
 include README.md
 include CHANGELOG.md
 include Dockerfile
-include glmnet/*
+include glmnet/glmnet.f
+include glmnet/glmnet.pyf
+include glmnet/glmnet.f
