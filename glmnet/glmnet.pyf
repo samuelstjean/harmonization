@@ -1,7 +1,7 @@
 !    -*- f90 -*-
 ! Note: the context of this file is case sensitive.
 
-python module _glmnet ! in 
+python module _glmnet ! in
     interface  ! in :_glmnet
 
         subroutine get_int_parms(sml,eps,big,mnlam,rsqmax,pmin,exmx) ! in :glmnet5:glmnet5.f
@@ -12,34 +12,42 @@ python module _glmnet ! in
             real*8 :: rsqmax
             real*8 :: pmin
             real*8 :: exmx
+        threadsafe
         end subroutine get_int_parms
 
         subroutine chg_fract_dev(arg) ! in :glmnet5:glmnet5.f
             real*8 :: arg
+        threadsafe
         end subroutine chg_fract_dev
 
         subroutine chg_dev_max(arg) ! in :glmnet5:glmnet5.f
             real*8 :: arg
+        threadsafe
         end subroutine chg_dev_max
 
         subroutine chg_min_flmin(arg) ! in :glmnet5:glmnet5.f
             real*8 :: arg
+        threadsafe
         end subroutine chg_min_flmin
 
         subroutine chg_big(arg) ! in :glmnet5:glmnet5.f
             real*8 :: arg
+        threadsafe
         end subroutine chg_big
 
         subroutine chg_min_lambdas(irg) ! in :glmnet5:glmnet5.f
             integer :: irg
+        threadsafe
         end subroutine chg_min_lambdas
-	
+
         subroutine chg_min_null_prob(arg) ! in :glmnet5:glmnet5.f
             real*8 :: arg
+        threadsafe
         end subroutine chg_min_null_prob
 
         subroutine chg_max_exp(arg) ! in :glmnet5:glmnet5.f
             real*8 :: arg
+        threadsafe
         end subroutine chg_max_exp
 
         subroutine elnet(ka,parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
@@ -73,6 +81,7 @@ python module _glmnet ! in
             real*8 intent(out),dimension(nlam),depend(nlam) :: alm
             integer intent(out) :: nlp
             integer intent(out) :: jerr
+        threadsafe
         end subroutine elnet
 
         subroutine elnetu(parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
@@ -103,6 +112,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine elnetu
 
         subroutine standard(no,ni,x,y,w,isd,intr,ju,g,xm,xs,ym,ys,xv,jerr) ! in :glmnet5:glmnet5.f
@@ -121,6 +131,7 @@ python module _glmnet ! in
             real*8 :: ys
             real*8 dimension(ni),depend(ni) :: xv
             integer :: jerr
+        threadsafe
         end subroutine standard
 
         subroutine elnet1(beta,ni,ju,vp,cl,g,no,ne,nx,x,nlam,flmin,ulam,thr,maxit,xv,lmu,ao,ia,kin,rsqo,almo,nlp,jerr) ! in :glmnet5:glmnet5.f
@@ -148,6 +159,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: almo
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine elnet1
 
         subroutine elnetn(parm,no,ni,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
@@ -178,6 +190,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine elnetn
 
         subroutine standard1(no,ni,x,y,w,isd,intr,ju,xm,xs,ym,ys,xv,jerr) ! in :glmnet5:glmnet5.f
@@ -195,6 +208,7 @@ python module _glmnet ! in
             real*8 :: ys
             real*8 dimension(ni),depend(ni) :: xv
             integer :: jerr
+        threadsafe
         end subroutine standard1
 
         subroutine elnet2(beta,ni,ju,vp,cl,y,no,ne,nx,x,nlam,flmin,ulam,thr,maxit,xv,lmu,ao,ia,kin,rsqo,almo,nlp,jerr) ! in :glmnet5:glmnet5.f
@@ -222,6 +236,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: almo
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine elnet2
 
         subroutine chkvars(no,ni,x,ju) ! in :glmnet5:glmnet5.f
@@ -229,6 +244,7 @@ python module _glmnet ! in
             integer, optional,check(shape(x,1)==ni),depend(x) :: ni=shape(x,1)
             real*8 dimension(no,ni) :: x
             integer dimension(ni),depend(ni) :: ju
+        threadsafe
         end subroutine chkvars
 
         subroutine uncomp(ni,ca,ia,nin,a) ! in :glmnet5:glmnet5.f
@@ -237,6 +253,7 @@ python module _glmnet ! in
             integer dimension(*) :: ia
             integer :: nin
             real*8 dimension(ni) :: a
+        threadsafe
         end subroutine uncomp
 
         subroutine modval(a0,ca,ia,nin,n,x,f) ! in :glmnet5:glmnet5.f
@@ -247,6 +264,7 @@ python module _glmnet ! in
             integer, optional,check(shape(x,0)==n),depend(x) :: n=shape(x,0)
             real*8 dimension(n,*) :: x
             real*8 dimension(n),depend(n) :: f
+        threadsafe
         end subroutine modval
 
         subroutine spelnet(ka,parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
@@ -282,6 +300,7 @@ python module _glmnet ! in
             real*8 intent(out),dimension(nlam),depend(nlam) :: alm
             integer intent(out) :: nlp
             integer intent(out) :: jerr
+        threadsafe
         end subroutine spelnet
 
         subroutine spelnetu(parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
@@ -314,6 +333,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine spelnetu
 
         subroutine spstandard(no,ni,x,ix,jx,y,w,ju,isd,intr,g,xm,xs,ym,ys,xv,jerr) ! in :glmnet5:glmnet5.f
@@ -334,6 +354,7 @@ python module _glmnet ! in
             real*8 :: ys
             real*8 dimension(ni),depend(ni) :: xv
             integer :: jerr
+        threadsafe
         end subroutine spstandard
 
         subroutine spelnet1(beta,ni,g,no,w,ne,nx,x,ix,jx,ju,vp,cl,nlam,flmin,ulam,thr,maxit,xm,xs,xv,lmu,ao,ia,kin,rsqo,almo,nlp,jerr) ! in :glmnet5:glmnet5.f
@@ -366,6 +387,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: almo
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine spelnet1
 
         subroutine spelnetn(parm,no,ni,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
@@ -398,6 +420,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine spelnetn
 
         subroutine spstandard1(no,ni,x,ix,jx,y,w,ju,isd,intr,xm,xs,ym,ys,xv,jerr) ! in :glmnet5:glmnet5.f
@@ -417,6 +440,7 @@ python module _glmnet ! in
             real*8 :: ys
             real*8 dimension(ni),depend(ni) :: xv
             integer :: jerr
+        threadsafe
         end subroutine spstandard1
 
         subroutine spelnet2(beta,ni,y,w,no,ne,nx,x,ix,jx,ju,vp,cl,nlam,flmin,ulam,thr,maxit,xm,xs,xv,lmu,ao,ia,kin,rsqo,almo,nlp,jerr) ! in :glmnet5:glmnet5.f
@@ -449,6 +473,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: almo
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine spelnet2
 
         subroutine spchkvars(no,ni,x,ix,ju) ! in :glmnet5:glmnet5.f
@@ -457,6 +482,7 @@ python module _glmnet ! in
             real*8 dimension(*) :: x
             integer dimension(*) :: ix
             integer dimension(ni) :: ju
+        threadsafe
         end subroutine spchkvars
 
         subroutine cmodval(a0,ca,ia,nin,x,ix,jx,n,f) ! in :glmnet5:glmnet5.f
@@ -469,6 +495,7 @@ python module _glmnet ! in
             integer dimension(*) :: jx
             integer, optional,check(len(f)>=n),depend(f) :: n=len(f)
             real*8 dimension(n) :: f
+        threadsafe
         end subroutine cmodval
 
         function row_prod(i,j,ia,ja,ra,w) ! in :glmnet5:glmnet5.f
@@ -496,7 +523,7 @@ python module _glmnet ! in
             real*8 :: parm
             integer intent(hide),check(shape(x,0)==no),depend(x) :: no=shape(x,0)
             integer intent(hide),check(shape(x,1)==ni),depend(x) :: ni=shape(x,1)
-            integer check(shape(y,1)==max(2,nc)),depend(y) :: nc            
+            integer check(shape(y,1)==max(2,nc)),depend(y) :: nc
 	    real*8 dimension(no,ni) :: x
             real*8 dimension(no,max(2,nc)),depend(no) :: y
             real*8 dimension(no,shape(y,1)),depend(no) :: g
@@ -525,6 +552,7 @@ python module _glmnet ! in
             real*8 intent(out),dimension(nlam),depend(nlam) :: alm
             integer intent(out) :: nlp
             integer intent(out) :: jerr
+        threadsafe
         end subroutine lognet
 
         subroutine lstandard1(no,ni,x,w,ju,isd,intr,xm,xs) ! in :glmnet5:glmnet5.f
@@ -537,6 +565,7 @@ python module _glmnet ! in
             integer :: intr
             real*8 dimension(ni),depend(ni) :: xm
             real*8 dimension(ni),depend(ni) :: xs
+        threadsafe
         end subroutine lstandard1
         subroutine multlstandard1(no,ni,x,w,ju,isd,intr,xm,xs,xv) ! in :glmnet5:glmnet5.f
             integer, optional,check(shape(x,0)==no),depend(x) :: no=shape(x,0)
@@ -549,6 +578,7 @@ python module _glmnet ! in
             real*8 dimension(ni),depend(ni) :: xm
             real*8 dimension(ni),depend(ni) :: xs
             real*8 dimension(ni),depend(ni) :: xv
+        threadsafe
         end subroutine multlstandard1
         subroutine lognet2n(parm,no,ni,x,y,g,w,ju,vp,cl,ne,nx,nlam,flmin,ulam,shri,isd,intr,maxit,kopt,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -581,6 +611,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine lognet2n
         function dev2(n,w,y,p,pmin) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(w)>=n),depend(w) :: n=len(w)
@@ -630,6 +661,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine lognetn
         subroutine kazero(kk,n,y,g,q,az,jerr) ! in :glmnet5:glmnet5.f
             integer, optional,check(shape(y,1)==kk),depend(y) :: kk=shape(y,1)
@@ -639,6 +671,7 @@ python module _glmnet ! in
             real*8 dimension(n),depend(n) :: q
             real*8 dimension(kk),depend(kk) :: az
             integer :: jerr
+        threadsafe
         end subroutine kazero
         function elc(parm,n,cl,a,m) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -666,6 +699,7 @@ python module _glmnet ! in
             integer dimension(nx),depend(nx) :: ia
             integer :: nin
             real*8 dimension(ni,nc),depend(nc) :: a
+        threadsafe
         end subroutine luncomp
         subroutine lmodval(nt,x,nc,nx,a0,ca,ia,nin,ans) ! in :glmnet5:glmnet5.f
             integer, optional,check(shape(x,0)==nt),depend(x) :: nt=shape(x,0)
@@ -677,6 +711,7 @@ python module _glmnet ! in
             integer dimension(nx),depend(nx) :: ia
             integer :: nin
             real*8 dimension(nc,nt),depend(nc,nt) :: ans
+        threadsafe
         end subroutine lmodval
 
         subroutine splognet(parm,no,ni,nc,x,ix,jx,y,g,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,kopt,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
@@ -714,6 +749,7 @@ python module _glmnet ! in
             real*8 intent(out),dimension(nlam),depend(nlam) :: alm
             integer intent(out) :: nlp
             integer intent(out) :: jerr
+        threadsafe
         end subroutine splognet
 
         subroutine multsplstandard2(no,ni,x,ix,jx,w,ju,isd,intr,xm,xs,xv) ! in :glmnet5:glmnet5.f
@@ -729,6 +765,7 @@ python module _glmnet ! in
             real*8 dimension(ni),depend(ni) :: xm
             real*8 dimension(ni),depend(ni) :: xs
             real*8 dimension(ni),depend(ni) :: xv
+        threadsafe
         end subroutine multsplstandard2
         subroutine splstandard2(no,ni,x,ix,jx,w,ju,isd,intr,xm,xs) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(w)>=no),depend(w) :: no=len(w)
@@ -742,6 +779,7 @@ python module _glmnet ! in
             integer :: intr
             real*8 dimension(ni),depend(ni) :: xm
             real*8 dimension(ni),depend(ni) :: xs
+        threadsafe
         end subroutine splstandard2
         subroutine sprlognet2n(parm,no,ni,x,ix,jx,y,g,w,ju,vp,cl,ne,nx,nlam,flmin,ulam,shri,isd,intr,maxit,kopt,xb,xs,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -778,6 +816,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine sprlognet2n
         subroutine sprlognetn(parm,no,ni,nc,x,ix,jx,y,g,w,ju,vp,cl,ne,nx,nlam,flmin,ulam,shri,isd,intr,maxit,kopt,xb,xs,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -815,6 +854,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine sprlognetn
         subroutine lcmodval(nc,nx,a0,ca,ia,nin,x,ix,jx,n,f) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(a0)>=nc),depend(a0) :: nc=len(a0)
@@ -828,6 +868,7 @@ python module _glmnet ! in
             integer dimension(*) :: jx
             integer, optional,check(shape(f,1)==n),depend(f) :: n=shape(f,1)
             real*8 dimension(nc,n),depend(nc) :: f
+        threadsafe
         end subroutine lcmodval
         subroutine coxnet(parm,no,ni,x,y,d,g,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,maxit,isd,lmu,ca,ia,nin,dev0,dev,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -858,6 +899,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine coxnet
         subroutine cstandard(no,ni,x,w,ju,isd,xs) ! in :glmnet5:glmnet5.f
             integer, optional,check(shape(x,0)==no),depend(x) :: no=shape(x,0)
@@ -867,6 +909,7 @@ python module _glmnet ! in
             integer dimension(ni),depend(ni) :: ju
             integer :: isd
             real*8 dimension(ni),depend(ni) :: xs
+        threadsafe
         end subroutine cstandard
         subroutine coxnet1(parm,no,ni,x,y,d,g,q,ju,vp,cl,ne,nx,nlam,flmin,ulam,cthri,isd,maxit,lmu,ao,m,kin,dev0,dev,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -897,6 +940,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine coxnet1
         subroutine cxmodval(ca,ia,nin,n,x,f) ! in :glmnet5:glmnet5.f
             real*8 dimension(nin) :: ca
@@ -905,6 +949,7 @@ python module _glmnet ! in
             integer, optional,check(shape(x,0)==n),depend(x) :: n=shape(x,0)
             real*8 dimension(n,*) :: x
             real*8 dimension(n),depend(n) :: f
+        threadsafe
         end subroutine cxmodval
         subroutine groups(no,y,d,q,nk,kp,jp,t0,jerr) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(y)>=no),depend(y) :: no=len(y)
@@ -916,6 +961,7 @@ python module _glmnet ! in
             integer dimension(no),depend(no) :: jp
             real*8 :: t0
             integer :: jerr
+        threadsafe
         end subroutine groups
         subroutine outer(no,nk,d,dk,kp,jp,e,wr,w,jerr,u) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(d)>=no),depend(d) :: no=len(d)
@@ -929,6 +975,7 @@ python module _glmnet ! in
             real*8 dimension(no),depend(no) :: w
             integer :: jerr
             real*8 dimension(no),depend(no) :: u
+        threadsafe
         end subroutine outer
         subroutine vars(no,ni,x,w,ixx,v) ! in :glmnet5:glmnet5.f
             integer, optional,check(shape(x,0)==no),depend(x) :: no=shape(x,0)
@@ -937,6 +984,7 @@ python module _glmnet ! in
             real*8 dimension(no),depend(no) :: w
             integer dimension(ni),depend(ni) :: ixx
             real*8 dimension(ni),depend(ni) :: v
+        threadsafe
         end subroutine vars
         subroutine died(no,nk,d,kp,jp,dk) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(d)>=no),depend(d) :: no=len(d)
@@ -945,6 +993,7 @@ python module _glmnet ! in
             integer dimension(nk) :: kp
             integer dimension(no),depend(no) :: jp
             real*8 dimension(nk),depend(nk) :: dk
+        threadsafe
         end subroutine died
         subroutine usk(no,nk,kp,jp,e,u) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(jp)>=no),depend(jp) :: no=len(jp)
@@ -953,6 +1002,7 @@ python module _glmnet ! in
             integer dimension(no) :: jp
             real*8 dimension(no),depend(no) :: e
             real*8 dimension(nk),depend(nk) :: u
+        threadsafe
         end subroutine usk
         function risk(no,ni,nk,d,dk,f,e,kp,jp,u) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(d)>=no),depend(d) :: no=len(d)
@@ -979,6 +1029,7 @@ python module _glmnet ! in
             real*8 dimension(ni,nlam),depend(ni) :: a
             real*8 dimension(nlam),depend(nlam) :: flog
             integer :: jerr
+        threadsafe
         end subroutine loglike
         subroutine fishnet(parm,no,ni,x,y,g,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -1010,6 +1061,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine fishnet
         subroutine fishnet1(parm,no,ni,x,y,g,q,ju,vp,cl,ne,nx,nlam,flmin,ulam,shri,isd,intr,maxit,lmu,a0,ca,m,kin,dev0,dev,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -1041,6 +1093,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine fishnet1
         function nonzero(n,v) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(v)>=n),depend(v) :: n=len(v)
@@ -1055,6 +1108,7 @@ python module _glmnet ! in
             integer dimension(nx),depend(nx) :: ia
             integer dimension(lmu),depend(lmu) :: nin
             real*8 dimension(ni,lmu),depend(lmu) :: b
+        threadsafe
         end subroutine solns
         subroutine lsolns(ni,nx,nc,lmu,a,ia,nin,b) ! in :glmnet5:glmnet5.f
             integer, optional,check(shape(b,0)==ni),depend(b) :: ni=shape(b,0)
@@ -1065,6 +1119,7 @@ python module _glmnet ! in
             integer dimension(nx),depend(nx) :: ia
             integer dimension(lmu),depend(lmu) :: nin
             real*8 dimension(ni,nc,lmu),depend(nc,lmu) :: b
+        threadsafe
         end subroutine lsolns
         subroutine deviance(no,ni,x,y,g,q,nlam,a0,a,flog,jerr) ! in :glmnet5:glmnet5.f
             integer, optional,check(shape(x,0)==no),depend(x) :: no=shape(x,0)
@@ -1078,6 +1133,7 @@ python module _glmnet ! in
             real*8 dimension(ni,nlam),depend(ni,nlam) :: a
             real*8 dimension(nlam),depend(nlam) :: flog
             integer :: jerr
+        threadsafe
         end subroutine deviance
         subroutine spfishnet(parm,no,ni,x,ix,jx,y,g,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,intr,maxit,lmu,a0,ca,ia,nin,dev0,dev,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -1111,6 +1167,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine spfishnet
         subroutine spfishnet1(parm,no,ni,x,ix,jx,y,g,q,ju,vp,cl,ne,nx,nlam,flmin,ulam,shri,isd,intr,maxit,xb,xs,lmu,a0,ca,m,kin,dev0,dev,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -1146,6 +1203,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine spfishnet1
         subroutine spdeviance(no,ni,x,ix,jx,y,g,q,nlam,a0,a,flog,jerr) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(y)>=no),depend(y) :: no=len(y)
@@ -1161,6 +1219,7 @@ python module _glmnet ! in
             real*8 dimension(ni,nlam),depend(nlam) :: a
             real*8 dimension(nlam),depend(nlam) :: flog
             integer :: jerr
+        threadsafe
         end subroutine spdeviance
         subroutine cspdeviance(no,x,ix,jx,y,g,q,nx,nlam,a0,ca,ia,nin,flog,jerr) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(y)>=no),depend(y) :: no=len(y)
@@ -1178,6 +1237,7 @@ python module _glmnet ! in
             integer dimension(nlam),depend(nlam) :: nin
             real*8 dimension(nlam),depend(nlam) :: flog
             integer :: jerr
+        threadsafe
         end subroutine cspdeviance
         subroutine multelnet(parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -1211,6 +1271,7 @@ python module _glmnet ! in
             real*8 intent(out),dimension(nlam),depend(nlam) :: alm
             integer intent(out) :: nlp
             integer intent(out) :: jerr
+        threadsafe
         end subroutine multelnet
         subroutine multelnetn(parm,no,ni,nr,x,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -1242,6 +1303,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine multelnetn
         subroutine multstandard1(no,ni,nr,x,y,w,isd,jsd,intr,ju,xm,xs,ym,ys,xv,ys0,jerr) ! in :glmnet5:glmnet5.f
             integer, optional,check(shape(x,0)==no),depend(x) :: no=shape(x,0)
@@ -1261,6 +1323,7 @@ python module _glmnet ! in
             real*8 dimension(ni),depend(ni) :: xv
             real*8 :: ys0
             integer :: jerr
+        threadsafe
         end subroutine multstandard1
         subroutine multelnet2(beta,ni,nr,ju,vp,cl,y,no,ne,nx,x,nlam,flmin,ulam,thri,maxit,xv,ys0,lmu,ao,ia,kin,rsqo,almo,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: beta
@@ -1289,6 +1352,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: almo
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine multelnet2
         subroutine chkbnds(nr,gk,gkn,xv,cl,al1,al2,a,isc,jerr) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(gk)>=nr),depend(gk) :: nr=len(gk)
@@ -1301,6 +1365,7 @@ python module _glmnet ! in
             real*8 dimension(nr),depend(nr) :: a
             integer dimension(nr),depend(nr) :: isc
             integer :: jerr
+        threadsafe
         end subroutine chkbnds
         subroutine chkbnds1(nr,gk,gkn,xv,cl1,cl2,al1,al2,a,isc,jerr) ! in :glmnet5:glmnet5.f
             integer, optional,check(len(gk)>=nr),depend(gk) :: nr=len(gk)
@@ -1314,6 +1379,7 @@ python module _glmnet ! in
             real*8 dimension(nr),depend(nr) :: a
             integer dimension(nr),depend(nr) :: isc
             integer :: jerr
+        threadsafe
         end subroutine chkbnds1
         function bnorm(b0,al1p,al2p,g,usq,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: b0
@@ -1327,10 +1393,12 @@ python module _glmnet ! in
         subroutine chg_bnorm(arg,irg) ! in :glmnet5:glmnet5.f
             real*8 :: arg
             integer :: irg
+        threadsafe
         end subroutine chg_bnorm
         subroutine get_bnorm(arg,irg) ! in :glmnet5:glmnet5.f
             real*8 :: arg
             integer :: irg
+        threadsafe
         end subroutine get_bnorm
         subroutine multsolns(ni,nx,nr,lmu,a,ia,nin,b) ! in :glmnet5:glmnet5.f
             integer, optional,check(shape(b,0)==ni),depend(b) :: ni=shape(b,0)
@@ -1341,6 +1409,7 @@ python module _glmnet ! in
             integer dimension(nx),depend(nx) :: ia
             integer dimension(lmu),depend(lmu) :: nin
             real*8 dimension(ni,nr,lmu),depend(nr,lmu) :: b
+        threadsafe
         end subroutine multsolns
         subroutine multuncomp(ni,nr,nx,ca,ia,nin,a) ! in :glmnet5:glmnet5.f
             integer, optional,check(shape(a,0)==ni),depend(a) :: ni=shape(a,0)
@@ -1350,6 +1419,7 @@ python module _glmnet ! in
             integer dimension(nx),depend(nx) :: ia
             integer :: nin
             real*8 dimension(ni,nr),depend(nr) :: a
+        threadsafe
         end subroutine multuncomp
         subroutine multmodval(nx,nr,a0,ca,ia,nin,n,x,f) ! in :glmnet5:glmnet5.f
             integer, optional,check(shape(ca,0)==nx),depend(ca) :: nx=shape(ca,0)
@@ -1361,6 +1431,7 @@ python module _glmnet ! in
             integer, optional,check(shape(x,0)==n),depend(x) :: n=shape(x,0)
             real*8 dimension(n,*) :: x
             real*8 dimension(nr,n),depend(nr,n) :: f
+        threadsafe
         end subroutine multmodval
         subroutine multspelnet(parm,no,ni,nr,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -1396,6 +1467,7 @@ python module _glmnet ! in
             real*8 intent(out),dimension(nlam),depend(nlam) :: alm
             integer intent(out):: nlp
             integer intent(out):: jerr
+        threadsafe
         end subroutine multspelnet
         subroutine multspelnetn(parm,no,ni,nr,x,ix,jx,y,w,jd,vp,cl,ne,nx,nlam,flmin,ulam,thr,isd,jsd,intr,maxit,lmu,a0,ca,ia,nin,rsq,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -1429,6 +1501,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine multspelnetn
         subroutine multspstandard1(no,ni,nr,x,ix,jx,y,w,ju,isd,jsd,intr,xm,xs,ym,ys,xv,ys0,jerr) ! in :glmnet5:glmnet5.f
             integer, optional,check(shape(y,0)==no),depend(y) :: no=shape(y,0)
@@ -1450,6 +1523,7 @@ python module _glmnet ! in
             real*8 dimension(ni),depend(ni) :: xv
             real*8 :: ys0
             integer :: jerr
+        threadsafe
         end subroutine multspstandard1
         subroutine multspelnet2(beta,ni,nr,y,w,no,ne,nx,x,ix,jx,ju,vp,cl,nlam,flmin,ulam,thri,maxit,xm,xs,xv,ys0,lmu,ao,ia,kin,rsqo,almo,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: beta
@@ -1483,6 +1557,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: almo
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine multspelnet2
         subroutine multlognetn(parm,no,ni,nc,x,y,g,w,ju,vp,cl,ne,nx,nlam,flmin,ulam,shri,intr,maxit,xv,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -1515,6 +1590,7 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine multlognetn
         subroutine multsprlognetn(parm,no,ni,nc,x,ix,jx,y,g,w,ju,vp,cl,ne,nx,nlam,flmin,ulam,shri,intr,maxit,xv,xb,xs,lmu,a0,a,m,kin,dev0,dev,alm,nlp,jerr) ! in :glmnet5:glmnet5.f
             real*8 :: parm
@@ -1551,14 +1627,16 @@ python module _glmnet ! in
             real*8 dimension(nlam),depend(nlam) :: alm
             integer :: nlp
             integer :: jerr
+        threadsafe
         end subroutine multsprlognetn
         subroutine psort7(v,a,ii,jj) ! in :glmnet5:glmnet5.f
             real*8 dimension(jj) :: v
             integer dimension(jj),depend(jj) :: a
             integer :: ii
             integer, optional,check(len(v)>=jj),depend(v) :: jj=len(v)
+        threadsafe
         end subroutine psort7
-    end interface 
+    end interface
 end python module glmnet5
 
 ! This file was auto-generated with f2py (version:2).
