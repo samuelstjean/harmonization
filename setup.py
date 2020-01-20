@@ -8,10 +8,10 @@ with open('requirements.txt') as f:
     install_requires = f.read().splitlines()
 
 # f_sources = ['glmnet/glmnet.f']
-# f_sources = ['glmnet/_glmnet.pyf',
-#              'glmnet/glmnet5.f90']
+f_sources = ['glmnet/_glmnet.pyf',
+             'glmnet/glmnet5.f90']
 
-f_sources = ['glmnet/glmnet5.f90']
+# f_sources = ['glmnet/GLMnet.f']
 
 
 fflags = ['-fdefault-real-8',
