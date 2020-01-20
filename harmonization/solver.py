@@ -92,7 +92,7 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
         else:
             batch_size = 'auto'
 
-        stuff = Parallel(n_jobs=ncores, batch_size=batch_size)(delayed(lasso_path_parallel)(*args) for args in arglist)
+        stuff = Parallel(n_jobs=ncores, batch_size=batch_size, verbose=5)(delayed(lasso_path_parallel)(*args) for args in arglist)
     else:
         raise ValueError('Only joblib path is supported now.')
 
