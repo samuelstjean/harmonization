@@ -76,6 +76,9 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
                 standardize,
                 use_crossval) for i in range(alpha.shape[1]))
 
+    if progressbar:
+        arglist = tqdm(arglist)
+
     if use_joblib:
         stuff = Parallel(n_jobs=ncores,
                          pre_dispatch=pre_dispatch)(delayed(lasso_path_parallel)(*args) for args in arglist)

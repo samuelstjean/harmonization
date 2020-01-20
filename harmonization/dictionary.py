@@ -200,7 +200,6 @@ def rebuild(data, mask, D, block_size, block_up, ncores=-1,
     blocks = blocks[mask]
 
     tt = time()
-    print(blocks.shape, D_depimpe.shape)
     X_small_denoised, alpha, intercept, _ = solve_l1(blocks, D_depimpe, variance=variance, return_all=True, nlambdas=100, use_joblib=True,
                                                      positivity=positivity, fit_intercept=True, standardize=True, progressbar=True,
                                                      ncores=ncores, use_crossval=use_crossval)
