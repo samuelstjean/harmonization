@@ -87,10 +87,12 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
             else:
                 cpus = ncores
             batch_size = X.shape[0] // 3*cpus
+            verbose = progressbar
         else:
             batch_size = 'auto'
+            verbose = 0
 
-        stuff = Parallel(n_jobs=ncores, batch_size=batch_size, verbose=5)(delayed(lasso_path_parallel)(*args) for args in arglist)
+        stuff = Parallel(n_jobs=ncores, batch_size=batch_size, verbose=verbose)(delayed(lasso_path_parallel)(*args) for args in arglist)
     else:
         raise ValueError('Only joblib path is supported now.')
 
