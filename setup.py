@@ -9,13 +9,6 @@ with open('requirements.txt') as f:
 
 f_sources = ['glmnet/glmnet.f', 'glmnet/glmnet.pyf']
 
-# f_sources = ['glmnet/_glmnet.pyf',
-             # 'glmnet/glmnet5.f90']
-
-# f_sources = ['glmnet/GLMnet.f']
-# f_sources = ['glmnet/glmnet5.f90']
-
-
 fflags = ['-fdefault-real-8',
           '-ffixed-form',
           '-O3',
