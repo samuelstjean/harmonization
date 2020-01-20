@@ -157,7 +157,7 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
     return beta[:, best_idx], a0[best_idx], yhat[:, best_idx], alm[best_idx]
 
 
-def elastic_net(X, y, rho, pos=False, thr=1e-7, weights=None, vp=None, copy=True, ulam=None, jd=np.zeros(1),
+def elastic_net(X, y, rho, pos=False, thr=1e-7, weights=None, vp=None, copy=False, ulam=None, jd=np.zeros(1),
                 standardize=False, nlam=100, maxit=100000, flmin=1e-4, fit_intercept=False, custom_path=False):
     """
     Raw-output wrapper for elastic net linear regression.
