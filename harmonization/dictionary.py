@@ -22,7 +22,7 @@ from harmonization.recon import depimp_zoom, reconstruct_from_blocks
 
 
 def get_global_D(datasets, outfilename, block_size, ncores=None, batchsize=32, niter=500,
-                 use_std=False, positivity=False, fit_intercept=True, center=True,
+                 use_std=False, positivity=False, fit_intercept=True, center=True, nlambdas=100,
                  b0_threshold=20, split_b0s=True, **kwargs):
 
     # get the data shape so we can preallocate some arrays
@@ -149,13 +149,13 @@ def get_global_D(datasets, outfilename, block_size, ncores=None, batchsize=32, n
     # savename = 'Dic_' + outfilename + '_size_{}.npy'.format(block_size).replace(' ', '')
 
     D = online_DL(train_data, ncores=ncores, positivity=positivity, fit_intercept=fit_intercept, standardize=True,
-                  nlambdas=100, niter=niter, batchsize=batchsize, n_atoms=n_atoms, variance=variance_large,
+                  nlambdas=nlambdas, niter=niter, batchsize=batchsize, n_atoms=n_atoms, variance=variance_large,
                   progressbar=True, use_joblib=True)
 
     return D
 
 
-def rebuild(data, mask, D, block_size, block_up, ncores=-1,
+def rebuild(data, mask, D, block_size, block_up, ncores=-1, nlambdas=100,
             positivity=False, variance=None, fix_mean=True, fit_intercept=False, use_crossval=False):
 
     data = data * mask[..., None]
@@ -200,8 +200,8 @@ def rebuild(data, mask, D, block_size, block_up, ncores=-1,
     blocks = blocks[mask]
 
     tt = time()
-    X_small_denoised, alpha, intercept, _ = solve_l1(blocks, D_depimpe, variance=variance, return_all=True, nlambdas=100, use_joblib=True,
-                                                     positivity=positivity, fit_intercept=True, standardize=True, progressbar=True,
+    X_small_denoised, alpha, intercept, _ = solve_l1(blocks, D_depimpe, variance=variance, return_all=True, nlambdas=nlambdas, use_joblib=True,
+                                                     positivity=positivity, fit_intercept=True, standardize=True, progressbar=True, verbose=5,
                                                      ncores=ncores, use_crossval=use_crossval)
 
     print('total time was {}'.format(time() - tt))
@@ -246,6 +246,7 @@ def harmonize_my_data(dataset, kwargs):
     split_b0s = kwargs['split_b0s']
     b0_threshold = kwargs['b0_threshold']
     ncores = kwargs['ncores']
+    nlambdas = kwargs['nlambdas']
     ext = kwargs['ext']
 
     print('Now rebuilding {}'.format(dataset['data']))
@@ -360,6 +361,7 @@ def harmonize_my_data(dataset, kwargs):
                                                     ncores=ncores,
                                                     positivity=positivity,
                                                     fix_mean=fix_mean,
+                                                    nlambdas=nlambdas,
                                                     # center=center,
                                                     fit_intercept=fit_intercept,
                                                     use_crossval=use_crossval,
@@ -367,8 +369,6 @@ def harmonize_my_data(dataset, kwargs):
         predicted /= divider
 
         if center:
-            print(mask.shape, predicted.shape, data_mean.shape)
-            print(predicted[mask].shape)
             predicted[mask] += data_mean
 
         # clip negatives, which happens at the borders

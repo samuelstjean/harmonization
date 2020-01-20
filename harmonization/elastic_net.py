@@ -143,7 +143,8 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
     df_mu = np.sum(beta != 0, axis=0, dtype=np.float32)
 
     # criterion according to 2.15 and 2.16 of https://projecteuclid.org/download/pdfview_1/euclid.aos/1194461726
-    criterion_value = n * np.log(mse) + w * df_mu
+    # criterion_value = n * np.log(mse) + w * df_mu
+    criterion_value = mse / np.var(y) + w * df_mu / n
 
     if criterion == 'aicc':
         with np.errstate(divide='ignore'):
@@ -153,6 +154,11 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
     criterion_value[df_mu == 0] = 1e300
     criterion_value[np.isnan(criterion_value)] = 1e300
     best_idx = np.argmin(criterion_value, axis=0)
+
+    # print(alm)
+    # print(best_idx, alm[best_idx])
+    # print(mse)
+    # print(df_mu)
 
     return beta[:, best_idx], a0[best_idx], yhat[:, best_idx], alm[best_idx]
 

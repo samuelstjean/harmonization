@@ -87,10 +87,8 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
             else:
                 cpus = ncores
             batch_size = X.shape[0] // 3*cpus
-            verbose = progressbar
         else:
             batch_size = 'auto'
-            verbose = 0
 
         stuff = Parallel(n_jobs=ncores, batch_size=batch_size, verbose=verbose)(delayed(lasso_path_parallel)(*args) for args in arglist)
     else:
@@ -108,7 +106,7 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
 
 def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3, variance=None,
               shuffle=True, fulldraw=False, positivity=False, fit_intercept=True, standardize=True, ncores=-1, nlambdas=100,
-              progressbar=True, disable_mkl=True, saveback=None, use_joblib=True, eps=1e-6):
+              progressbar=True, use_joblib=True, eps=1e-6):
 
     tt = time()
     seen_patches = 0
@@ -159,7 +157,7 @@ def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3
 
         x[:] = X[batch].reshape(batchsize, -1)
         _, _, _, lbda = solve_l1(x, D, alpha, positivity=positivity, ncores=ncores, nlambdas=nlambdas, variance=variance, return_all=True,
-                                 fit_intercept=fit_intercept, standardize=standardize, use_joblib=use_joblib, progressbar=False)
+                                 fit_intercept=fit_intercept, standardize=standardize, use_joblib=use_joblib, progressbar=False, verbose=False)
 
         np.dot(alpha, alpha.T, out=alpha_alpha_T)
         # x is transposed with regards to original notation
