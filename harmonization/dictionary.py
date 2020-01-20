@@ -278,7 +278,7 @@ def harmonize_my_data(dataset, kwargs):
         if center:
             # we need to pull down the 3D volume mean for the upsampling part to make sense though
             # We use nanmean because we implicitly exclude voxels with a value of 0 from the mean this way
-            data_mean = np.nanmean(np.where(data != 0, data, np.nan), axis=(0, 1, 2), keepdims=True)
+            data_mean = np.nanmean(np.where(data != 0, data, np.nan), axis=(0, 1, 2))
             data -= data_mean
 
         variance = None
@@ -352,6 +352,7 @@ def harmonize_my_data(dataset, kwargs):
             divider[list(b0_loc + idx)] += 1
 
             print('Now rebuilding volumes {} / block {} out of {}.'.format(b0_loc + idx, i, len(indexes)))
+            break
             predicted[..., b0_loc + idx] += rebuild(to_denoise,
                                                     mask,
                                                     D,
@@ -367,6 +368,8 @@ def harmonize_my_data(dataset, kwargs):
         predicted /= divider
 
         if center:
+            print(mask.shape, predicted.shape, data_mean.shape)
+            print(predicted[mask].shape)
             predicted[mask] += data_mean
 
         # clip negatives, which happens at the borders

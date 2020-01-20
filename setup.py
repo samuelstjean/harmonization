@@ -7,7 +7,14 @@ with open('README.md', encoding='utf-8') as f:
 with open('requirements.txt') as f:
     install_requires = f.read().splitlines()
 
-f_sources = ['glmnet/glmnet.f']
+f_sources = ['glmnet/glmnet.f', 'glmnet/glmnet.pyf']
+
+# f_sources = ['glmnet/_glmnet.pyf',
+             # 'glmnet/glmnet5.f90']
+
+# f_sources = ['glmnet/GLMnet.f']
+# f_sources = ['glmnet/glmnet5.f90']
+
 
 fflags = ['-fdefault-real-8',
           '-ffixed-form',

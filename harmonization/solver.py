@@ -5,7 +5,7 @@ import numpy as np
 from time import time
 from itertools import cycle, product
 
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, cpu_count
 from tqdm import tqdm
 
 from sklearn.utils import gen_batches
@@ -21,7 +21,7 @@ def update_D(D, A, B, X, niter=1, eps=1e-15, positivity=False):
     for _ in range(niter):
         # divide by zeros are replaced by 0, but still raise the warning, so we squelch it
         with np.errstate(divide='ignore', invalid='ignore'):
-            u[:] = np.where(np.diag(A) != 0, (B - np.dot(D, A))/np.diag(A) + D, 0)
+            u[:] = np.where(np.diag(A) != 0, (B - np.dot(D, A)) / np.diag(A) + D, 0)
 
         norm2[:] = np.sqrt(np.sum(u**2, axis=0))
 
@@ -67,18 +67,30 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
     intercept = np.zeros((alpha.shape[1], 1), dtype=np.float32)
     lbda = np.zeros((alpha.shape[1], 1), dtype=np.float32)
 
+    arglist = ((D,
+                X[i],
+                nlambdas,
+                positivity,
+                variance[i],
+                fit_intercept,
+                standardize,
+                use_crossval) for i in range(alpha.shape[1]))
+
+    if progressbar:
+        arglist = tqdm(arglist, total=X.shape[0])
+
     if use_joblib:
-        print(ncores)
-        stuff = Parallel(n_jobs=ncores,
-                         pre_dispatch=pre_dispatch,
-                         verbose=verbose)(delayed(lasso_path_parallel)(D,
-                                                                       X[i],
-                                                                       nlambdas=nlambdas,
-                                                                       positivity=positivity,
-                                                                       variance=variance[i],
-                                                                       fit_intercept=fit_intercept,
-                                                                       standardize=standardize,
-                                                                       use_crossval=use_crossval) for i in range(alpha.shape[1]))
+        # Custom batch size if we process lots of stuff, as it ends so fast joblib does not perform well usually for small jobs
+        if X.shape[0] > 10000:
+            if ncores < 0:
+                cpus = ncores + cpu_count()
+            else:
+                cpus = ncores
+            batch_size = X.shape[0] // 3*cpus
+        else:
+            batch_size = 'auto'
+
+        stuff = Parallel(n_jobs=ncores, batch_size=batch_size, verbose=5)(delayed(lasso_path_parallel)(*args) for args in arglist)
     else:
         raise ValueError('Only joblib path is supported now.')
 
@@ -145,10 +157,11 @@ def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3
 
         x[:] = X[batch].reshape(batchsize, -1)
         _, _, _, lbda = solve_l1(x, D, alpha, positivity=positivity, ncores=ncores, nlambdas=nlambdas, variance=variance, return_all=True,
-                                 fit_intercept=fit_intercept, standardize=standardize, use_joblib=use_joblib, progressbar=progressbar)
+                                 fit_intercept=fit_intercept, standardize=standardize, use_joblib=use_joblib, progressbar=False)
 
         np.dot(alpha, alpha.T, out=alpha_alpha_T)
-        np.dot(x.T, alpha.T, out=x_alpha_T)  # x is transposed with regards to original notation
+        # x is transposed with regards to original notation
+        np.dot(x.T, alpha.T, out=x_alpha_T)
 
         beta = (1 - (1 / t))**rho
 
