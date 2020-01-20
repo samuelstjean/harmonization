@@ -5,7 +5,7 @@ import numpy as np
 from time import time
 from itertools import cycle, product
 
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, cpu_count
 from tqdm import tqdm
 
 from sklearn.utils import gen_batches
@@ -82,7 +82,16 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
         arglist = tqdm(arglist, total=X.shape[0])
 
     if use_joblib:
-        batch_size = 10000
+        # Custom batch size if we process lots of stuff, as it ends so fast joblib does not perform well usually for small jobs
+        if X.shape[0] > 10000:
+            if ncores < 0:
+                cpus = ncores + cpu_count()
+            else:
+                cpus = ncores
+            batch_size = X.shape[0] // 3*cpus
+        else:
+            batch_size = 'auto'
+
         stuff = Parallel(n_jobs=ncores, batch_size=batch_size)(delayed(lasso_path_parallel)(*args) for args in arglist)
     else:
         raise ValueError('Only joblib path is supported now.')
