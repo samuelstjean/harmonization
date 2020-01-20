@@ -77,7 +77,7 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
                 use_crossval) for i in range(alpha.shape[1]))
 
     if progressbar:
-        arglist = tqdm(arglist)
+        arglist = tqdm(arglist, total=X.shape[0])
 
     if use_joblib:
         stuff = Parallel(n_jobs=ncores,
