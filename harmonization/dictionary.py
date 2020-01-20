@@ -234,7 +234,7 @@ def rebuild(data, mask, D, block_size, block_up, ncores=-1,
 
 def harmonize_my_data(dataset, kwargs):
 
-    outpath = kwargs.pop('outpath')
+    outpath = kwargs['outpath']
     path_D = kwargs['outfilename']
     center = kwargs['center']
     block_up = literal_eval(kwargs['block_up'])
