@@ -1,5 +1,7 @@
 from setuptools import find_packages
 from numpy.distutils.core import Extension, setup
+from io import open
+
 
 with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
@@ -20,13 +22,15 @@ module = Extension('harmonization._glmnet',
                    extra_f77_compile_args=fflags,
                    extra_f90_compile_args=fflags)
 
+scripts = ['scripts/harmonization_build_dictionary', 'scripts/harmonization_from_dictionary']
+
 setup(
     name='harmonization',
     version='0.1',
     author='Samuel St-Jean',
     author_email='samuel@isi.uu.nl',
     packages=find_packages(),
-    scripts=['scripts/harmonization_build_dictionary', 'scripts/harmonization_from_dictionary'],
+    scripts=scripts,
     url='https://github.com/samuelstjean/harmonization',
     license='GPL2',
     description='Implementation of "Harmonization of diffusion MRI datasets with adaptive dictionary learning".',
