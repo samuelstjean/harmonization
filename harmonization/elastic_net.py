@@ -143,10 +143,10 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
     df_mu = np.sum(beta != 0, axis=0, dtype=np.float32)
 
     # criterion from burnham and anderson
-    # criterion_value = n * np.log(mse) + w * df_mu
+    criterion_value = n * np.log(mse) + w * df_mu
 
     # criterion according to 2.15 and 2.16 of https://projecteuclid.org/download/pdfview_1/euclid.aos/1194461726
-    criterion_value = mse / np.var(y) + w * df_mu / n
+    # criterion_value = mse / np.var(y) + w * df_mu / n
 
     if criterion == 'aicc':
         with np.errstate(divide='ignore'):
@@ -164,7 +164,7 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
     # print(yhat[:, best_idx].flags)
 
     # Seems like the memory is not correctly freed internally when we call from fortran,
-    # so we copy eveything once to not keep references to it during the parallel processing
+    # so we copy everything once to not keep references to it during the parallel processing
     # or whatever, computer sciency stuff, it works :/
     beta = beta[:, best_idx].copy()
     a0 = a0[best_idx].copy()
