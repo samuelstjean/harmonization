@@ -40,7 +40,7 @@ split_b0s: True
 b0_threshold: 20
 batchsize: 32
 niter: 1500
-nlambdas: 200
+nlambdas: 100
 
 # ncores can be a positive or negative number, which indicates the number of cores to use or to leave free respectively.
 # ncores = -1 will use all cores

@@ -45,7 +45,7 @@ def lasso_path_parallel(D, X, nlambdas, positivity=False, variance=None, fit_int
         Xhat, alpha, intercept, lbda = lasso_crossval(D, X, nlam=nlambdas, fit_intercept=fit_intercept, n_splits=n_splits,
                                                       pos=positivity, standardize=standardize, penalty=None)
     else:
-        alpha, intercept, Xhat, lbda = lasso_path(D, X, nlam=nlambdas, fit_intercept=fit_intercept, criterion='aic',
+        alpha, intercept, Xhat, lbda = lasso_path(D, X, nlam=nlambdas, fit_intercept=fit_intercept, criterion='aicc',
                                                   pos=positivity, standardize=standardize, penalty=None)
 
     return Xhat, alpha, intercept, lbda
