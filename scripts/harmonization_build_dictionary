@@ -36,6 +36,8 @@ def main():
     path = kwargs.pop('path')
     use_glob = kwargs.pop('glob')
     outfilename = kwargs.pop('outfilename')
+    kwargs['positivity'] = kwargs.pop('positivity_D')
+    kwargs.pop('positivity_recon')
 
     datasets = get_filenames(path, use_glob, kwargs)
 

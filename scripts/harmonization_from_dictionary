@@ -11,7 +11,7 @@ from harmonization.dictionary import harmonize_my_data
 def main():
 
     if len(sys.argv) == 1:
-        usage = 'Usage : everything is set in config.yaml, that is the only input'
+        usage = 'Usage : everything is set in config.yaml, that is the only input.'
         print(usage)
         sys.exit(1)
 
@@ -20,6 +20,8 @@ def main():
 
     path = kwargs.pop('path')
     use_glob = kwargs.pop('glob')
+    kwargs.pop('positivity_D')
+    kwargs['positivity'] = kwargs.pop('positivity_recon')
 
     datasets = get_filenames(path, use_glob, kwargs)
 
