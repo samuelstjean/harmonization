@@ -27,7 +27,8 @@ maskname: _brain_mask.nii.gz
 block_size: 3, 3, 3, 5
 block_up: 3, 3, 3, 5
 use_std: False
-positivity: False
+positivity_D: False
+positivity_recon: True
 fit_intercept: True
 center: True
 

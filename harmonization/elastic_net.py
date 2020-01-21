@@ -142,8 +142,10 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
     mse = np.mean(squared_error, axis=0, dtype=np.float32)
     df_mu = np.sum(beta != 0, axis=0, dtype=np.float32)
 
-    # criterion according to 2.15 and 2.16 of https://projecteuclid.org/download/pdfview_1/euclid.aos/1194461726
+    # criterion from burnham and anderson
     # criterion_value = n * np.log(mse) + w * df_mu
+
+    # criterion according to 2.15 and 2.16 of https://projecteuclid.org/download/pdfview_1/euclid.aos/1194461726
     criterion_value = mse / np.var(y) + w * df_mu / n
 
     if criterion == 'aicc':
@@ -155,12 +157,28 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
     criterion_value[np.isnan(criterion_value)] = 1e300
     best_idx = np.argmin(criterion_value, axis=0)
 
-    # print(alm)
-    # print(best_idx, alm[best_idx])
-    # print(mse)
-    # print(df_mu)
+    # print('alm', alm.flags)
+    # print(alm[best_idx].flags)
+    # print(a0[best_idx].flags)
+    # print(beta[:, best_idx].flags)
+    # print(yhat[:, best_idx].flags)
 
-    return beta[:, best_idx], a0[best_idx], yhat[:, best_idx], alm[best_idx]
+    # Seems like the memory is not correctly freed internally when we call from fortran,
+    # so we copy eveything once to not keep references to it during the parallel processing
+    # or whatever, computer sciency stuff, it works :/
+    beta = beta[:, best_idx].copy()
+    a0 = a0[best_idx].copy()
+    yhat = yhat[:, best_idx].copy()
+    alm = alm[best_idx].copy()
+
+    # print('alm2', alm.flags)
+    # print(alm.flags)
+    # print(a0.flags)
+    # print(beta.flags)
+    # print(yhat.flags)
+
+    # return beta[:, best_idx], a0[best_idx], yhat[:, best_idx], alm[best_idx]
+    return beta, a0, yhat, alm
 
 
 def elastic_net(X, y, rho, pos=False, thr=1e-7, weights=None, vp=None, copy=True, ulam=None, jd=np.zeros(1),
