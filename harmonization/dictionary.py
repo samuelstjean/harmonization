@@ -8,6 +8,8 @@ from itertools import cycle
 from ast import literal_eval
 from time import time
 
+from scipy.ndimage import zoom
+
 # It's a private function in 0.24 now
 try:
     from sklearn.feature_extraction.image import _extract_patches as extract_patches
@@ -30,7 +32,9 @@ def get_global_D(datasets, outfilename, block_size, block_up, ncores=None, batch
     shape = nib.load(datasets[0]['data']).header.get_data_shape()
 
     # block size depends on the upsampling factor, so we pick the biggest one
-    if np.prod(literal_eval(block_up)) > np.prod(literal_eval(block_size)):
+    upsample = np.prod(literal_eval(block_up)) > np.prod(literal_eval(block_size))
+
+    if upsample:
         current_block_size = literal_eval(block_up)
     else:
         current_block_size = literal_eval(block_size)
@@ -151,8 +155,6 @@ def get_global_D(datasets, outfilename, block_size, block_up, ncores=None, batch
     else:
         variance_large = None
 
-    # savename = 'Dic_' + outfilename + '_size_{}.npy'.format(block_size).replace(' ', '')
-
     D = online_DL(train_data, ncores=ncores, positivity=positivity, fit_intercept=fit_intercept, standardize=True,
                   nlambdas=nlambdas, niter=niter, batchsize=batchsize, n_atoms=n_atoms, variance=variance_large,
                   progressbar=True, use_joblib=True)
@@ -253,6 +255,8 @@ def harmonize_my_data(dataset, kwargs):
     ncores = kwargs['ncores']
     nlambdas = kwargs['nlambdas']
     ext = kwargs['ext']
+
+    upsample = np.prod(literal_eval(block_up)) > np.prod(literal_eval(block_size))
 
     print('Now rebuilding {}'.format(dataset['data']))
     D = np.load(path_D)
@@ -360,6 +364,7 @@ def harmonize_my_data(dataset, kwargs):
             print(predicted.shape, mask.shape)
             print(factor, current_block_up, current_block_size)
             print('Now rebuilding volumes {} / block {} out of {}.'.format(b0_loc + idx, i, len(indexes)))
+            break
             predicted[..., b0_loc + idx] += rebuild(to_denoise,
                                                     mask,
                                                     D,
@@ -375,10 +380,14 @@ def harmonize_my_data(dataset, kwargs):
                                                     variance=variance)
         predicted /= divider
 
+        # If we upsample, the mask does not match anymore, so we upsample it
+        if upsample:
+            mask = zoom(mask, factor, order=0)
+        print(predicted.shape, mask.shape)
         if center:
             predicted[mask] += data_mean
 
-        # clip negatives, which happens at the borders
+        # clip negatives, which could? happens at the borders
         predicted.clip(min=0., out=predicted)
 
         imgfile = nib.Nifti1Image(predicted, affine, header)
