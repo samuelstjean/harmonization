@@ -176,7 +176,7 @@ def rebuild(data, mask, D, block_size, block_up, ncores=-1, nlambdas=100,
     if block_size == block_up:
         D_depimpe = np.copy(D)
     else:
-        D_depimpe = depimp_zoom(D, block_size, block_up, zoomarray=False)
+        D_depimpe = depimp_zoom(D, block_size, block_up)
 
     blocks = extract_patches(data, block_size, overlap).reshape(-1, np.prod(block_size))
     del data
