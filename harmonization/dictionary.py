@@ -256,7 +256,7 @@ def harmonize_my_data(dataset, kwargs):
     nlambdas = kwargs['nlambdas']
     ext = kwargs['ext']
 
-    upsample = np.prod(literal_eval(block_up)) > np.prod(literal_eval(block_size))
+    upsample = np.prod(block_up) > np.prod(block_size)
 
     print('Now rebuilding {}'.format(dataset['data']))
     D = np.load(path_D)
