@@ -382,7 +382,7 @@ def harmonize_my_data(dataset, kwargs):
 
         # If we upsample, the mask does not match anymore, so we upsample it
         if upsample:
-            mask = zoom(mask, factor, order=0)
+            mask = zoom(mask, factor[:-1], order=0)
         print(predicted.shape, mask.shape)
         if center:
             predicted[mask] += data_mean
