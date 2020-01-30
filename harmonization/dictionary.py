@@ -286,6 +286,7 @@ def harmonize_my_data(dataset, kwargs):
             # We use nanmean because we implicitly exclude voxels with a value of 0 from the mean this way
             data_mean = np.nanmean(np.where(data != 0, data, np.nan), axis=(0, 1, 2))
             data -= data_mean
+            print(data.shape, data_mean.shape)
 
         variance = None
 
@@ -356,7 +357,7 @@ def harmonize_my_data(dataset, kwargs):
             to_denoise[..., 0] = data[..., b0_loc].squeeze()
             to_denoise[..., 1:] = data[..., idx]
             divider[list(b0_loc + idx)] += 1
-
+            print(predicted.shape, predicted[mask].shape, mask.shape)
             print('Now rebuilding volumes {} / block {} out of {}.'.format(b0_loc + idx, i, len(indexes)))
             predicted[..., b0_loc + idx] += rebuild(to_denoise,
                                                     mask,
