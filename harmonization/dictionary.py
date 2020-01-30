@@ -21,14 +21,19 @@ from harmonization.solver import online_DL, solve_l1
 from harmonization.recon import depimp_zoom, reconstruct_from_blocks
 
 
-def get_global_D(datasets, outfilename, block_size, ncores=None, batchsize=32, niter=500,
+def get_global_D(datasets, outfilename, ncores=None, batchsize=32, niter=500,
                  use_std=False, positivity=False, fit_intercept=True, center=True, nlambdas=100,
                  b0_threshold=20, split_b0s=True, **kwargs):
 
     # get the data shape so we can preallocate some arrays
     # we also have to assume all datasets have the same 3D shape obviously
     shape = nib.load(datasets[0]['data']).header.get_data_shape()
-    current_block_size = literal_eval(block_size)
+
+    # block size depends on the upsampling factor, so we pick the biggest one
+    if np.prod(literal_eval(block_up)) > np.prod(literal_eval(block_size)):
+        current_block_size = literal_eval(block_up)
+    else:
+        current_block_size = literal_eval(block_size)
 
     n_atoms = int(np.prod(current_block_size) * 2)
     b0_block_size = tuple(current_block_size[:-1]) + ((current_block_size[-1] + 1,))

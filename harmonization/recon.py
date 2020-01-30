@@ -21,7 +21,7 @@ def depimp_zoom(D, block_size, block_up, order=1):
     # if we have a 4D block array and different last dimension, subsample it
     # if (len(block_up) == len(block_size)) and (block_up[-1] != block_size[-1]):
     size = tuple(block_up)
-
+    print(size, block_up, D.shape)
     if (len(block_up) - 1) == len(block_size):
         size = size + (block_size[-1],)
 
