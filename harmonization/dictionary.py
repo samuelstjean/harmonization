@@ -256,7 +256,7 @@ def harmonize_my_data(dataset, kwargs):
     nlambdas = kwargs['nlambdas']
     ext = kwargs['ext']
 
-    upsample = np.prod(block_up) > np.prod(block_size)
+    # upsample = np.prod(block_up) > np.prod(block_size)
 
     print('Now rebuilding {}'.format(dataset['data']))
     D = np.load(path_D)
@@ -380,14 +380,14 @@ def harmonize_my_data(dataset, kwargs):
                                                     variance=variance)
         predicted /= divider
 
-        # If we upsample, the mask does not match anymore, so we upsample it
-        if upsample:
-            mask = zoom(mask, factor[:-1], order=0)
-        print(predicted.shape, mask.shape)
+        # If we upsample, the mask does not match anymore, so we just add the mean to the nonzero regions
+        # if upsample:
+        #     mask = zoom(mask, factor[:-1], order=0)
+        # print(predicted.shape, mask.shape)
         if center:
-            predicted[mask] += data_mean
+            predicted[predicted > 0] += data_mean
 
-        # clip negatives, which could? happens at the borders
+        # clip negatives, which could(?) happens at the borders
         predicted.clip(min=0., out=predicted)
 
         imgfile = nib.Nifti1Image(predicted, affine, header)
