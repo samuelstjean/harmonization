@@ -21,7 +21,7 @@ from harmonization.solver import online_DL, solve_l1
 from harmonization.recon import depimp_zoom, reconstruct_from_blocks
 
 
-def get_global_D(datasets, outfilename, ncores=None, batchsize=32, niter=500,
+def get_global_D(datasets, outfilename, block_size, block_up, ncores=None, batchsize=32, niter=500,
                  use_std=False, positivity=False, fit_intercept=True, center=True, nlambdas=100,
                  b0_threshold=20, split_b0s=True, **kwargs):
 
