@@ -22,13 +22,14 @@ module = Extension('harmonization._glmnet',
                    extra_f77_compile_args=fflags,
                    extra_f90_compile_args=fflags)
 
-scripts = ['scripts/harmonization_build_dictionary', 'scripts/harmonization_from_dictionary']
+scripts = ['scripts/harmonization_build_dictionary',
+           'scripts/harmonization_from_dictionary']
 
 setup(
     name='harmonization',
     version='0.1',
     author='Samuel St-Jean',
-    author_email='samuel@isi.uu.nl',
+    author_email='samuel.st-jean@usherbrooke.ca',
     packages=find_packages(),
     scripts=scripts,
     url='https://github.com/samuelstjean/harmonization',

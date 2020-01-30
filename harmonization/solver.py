@@ -39,9 +39,15 @@ def update_D(D, A, B, X, niter=1, eps=1e-15, positivity=False):
             D.clip(min=0., out=D)
 
 
-def lasso_path_parallel(D, X, nlambdas, positivity=False, variance=None, fit_intercept=True, standardize=True, use_crossval=False, n_splits=3):
+def lasso_path_parallel(D, X, nlambdas, positivity=False, variance=None, fit_intercept=True, standardize=True, use_crossval=False):
 
     if use_crossval:
+        # use_crossval holds the number of split, if not we default to 3 because reasons
+        if use_crossval == 1:
+            n_splits = 3
+        else:
+            n_splits = use_crossval
+
         Xhat, alpha, intercept, lbda = lasso_crossval(D, X, nlam=nlambdas, fit_intercept=fit_intercept, n_splits=n_splits,
                                                       pos=positivity, standardize=standardize, penalty=None)
     else:
@@ -52,7 +58,7 @@ def lasso_path_parallel(D, X, nlambdas, positivity=False, variance=None, fit_int
 
 
 def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positivity=False, variance=None, fit_intercept=True, standardize=True,
-             progressbar=True, use_joblib=False, use_crossval=False, verbose=5, pre_dispatch='all'):
+             progressbar=True, use_joblib=False, use_crossval=False, verbose=5):
 
     if alpha is None:
         return_alpha = True

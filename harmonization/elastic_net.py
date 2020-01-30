@@ -75,7 +75,7 @@ def lasso_crossval(X, y, nlam=100, fit_intercept=False, pos=False, standardize=F
     return Xhat_best.squeeze(), beta_best.squeeze(), a0_best, alm_best
 
 
-def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
+def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None, variance=None,
                      fit_intercept=False, pos=False, standardize=False, weights=None, penalty=None):
     """return full path for ElasticNet"""
 
@@ -138,15 +138,16 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
     else:
         raise ValueError('Criterion {} is not supported!'.format(criterion))
 
-    squared_error = (y[..., None] - yhat)**2
-    mse = np.mean(squared_error, axis=0, dtype=np.float32)
+    mse = np.mean((y[:, None] - yhat)**2, axis=0, dtype=np.float32)
     df_mu = np.sum(beta != 0, axis=0, dtype=np.float32)
 
     # criterion from burnham and anderson
     criterion_value = n * np.log(mse) + w * df_mu
 
     # criterion according to 2.15 and 2.16 of https://projecteuclid.org/download/pdfview_1/euclid.aos/1194461726
-    # criterion_value = mse / np.var(y) + w * df_mu / n
+    # if variance is None:
+    #     variance = np.var(y)
+    # criterion_value = mse / variance + w * df_mu / n
 
     if criterion == 'aicc':
         with np.errstate(divide='ignore'):
@@ -157,12 +158,6 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
     criterion_value[np.isnan(criterion_value)] = 1e300
     best_idx = np.argmin(criterion_value, axis=0)
 
-    # print('alm', alm.flags)
-    # print(alm[best_idx].flags)
-    # print(a0[best_idx].flags)
-    # print(beta[:, best_idx].flags)
-    # print(yhat[:, best_idx].flags)
-
     # Seems like the memory is not correctly freed internally when we call from fortran,
     # so we copy everything once to not keep references to it during the parallel processing
     # or whatever, computer sciency stuff, it works :/
@@ -171,13 +166,6 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
     yhat = yhat[:, best_idx].copy()
     alm = alm[best_idx].copy()
 
-    # print('alm2', alm.flags)
-    # print(alm.flags)
-    # print(a0.flags)
-    # print(beta.flags)
-    # print(yhat.flags)
-
-    # return beta[:, best_idx], a0[best_idx], yhat[:, best_idx], alm[best_idx]
     return beta, a0, yhat, alm
 
 
