@@ -88,3 +88,7 @@ def reconstruct_from_blocks(patches, image_size, block_size, block_up, new_overl
 
     out = img[:-p_h, :-p_w, :-p_l] / div[:-p_h, :-p_w, :-p_l]
     return out
+
+asdasddassadd
+
+
