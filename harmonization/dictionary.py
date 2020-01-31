@@ -383,7 +383,8 @@ def harmonize_my_data(dataset, kwargs):
         print(predicted.shape, mask.shape)
         # If we upsample, the mask does not match anymore, so we also resample it
         if upsample:
-            mask = resize(mask, predicted.shape[:-1], order=0, mode='constant', anti_aliasing=False, preserve_range=True)
+            mask = resize(mask, predicted.shape[:-1], order=0,
+                          mode='constant', anti_aliasing=False, preserve_range=True).astype(np.bool)
             print(mask.dtype, mask.min(), mask.max())
 
         print(predicted.shape, mask.shape)
