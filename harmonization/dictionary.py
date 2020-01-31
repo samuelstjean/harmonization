@@ -290,7 +290,6 @@ def harmonize_my_data(dataset, kwargs):
             # We use nanmean because we implicitly exclude voxels with a value of 0 from the mean this way
             data_mean = np.nanmean(np.where(data != 0, data, np.nan), axis=(0, 1, 2))
             data -= data_mean
-            print(data.shape, data_mean.shape)
 
         variance = None
 
@@ -380,14 +379,12 @@ def harmonize_my_data(dataset, kwargs):
                                                     use_crossval=use_crossval,
                                                     variance=variance)
         predicted /= divider
-        print(predicted.shape, mask.shape)
+
         # If we upsample, the mask does not match anymore, so we also resample it
         if upsample:
             mask = resize(mask, predicted.shape[:-1], order=0,
                           mode='constant', anti_aliasing=False, preserve_range=True).astype(np.bool)
-            print(mask.dtype, mask.min(), mask.max())
 
-        print(predicted.shape, mask.shape)
         if center:
             predicted[mask] += data_mean
 
