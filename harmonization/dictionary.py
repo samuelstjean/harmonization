@@ -360,11 +360,9 @@ def harmonize_my_data(dataset, kwargs):
             to_denoise[..., 0] = data[..., b0_loc].squeeze()
             to_denoise[..., 1:] = data[..., idx]
             divider[list(b0_loc + idx)] += 1
-            print(predicted.shape, mask.shape)
-            print(factor, current_block_up, current_block_size)
+
             print('Now rebuilding volumes {} / block {} out of {}.'.format(b0_loc + idx, i, len(indexes)))
-            predicted[..., b0_loc + idx] += 1
-            break
+
             predicted[..., b0_loc + idx] += rebuild(to_denoise,
                                                     mask,
                                                     D,
