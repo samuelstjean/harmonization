@@ -8,7 +8,7 @@ from itertools import cycle
 from ast import literal_eval
 from time import time
 
-from scipy.ndimage import zoom
+from skimage.transform import resize
 
 # It's a private function in 0.24 now
 try:
@@ -256,7 +256,7 @@ def harmonize_my_data(dataset, kwargs):
     nlambdas = kwargs['nlambdas']
     ext = kwargs['ext']
 
-    # upsample = np.prod(block_up) > np.prod(block_size)
+    upsample = np.prod(block_up) > np.prod(block_size)
 
     print('Now rebuilding {}'.format(dataset['data']))
     D = np.load(path_D)
@@ -380,13 +380,14 @@ def harmonize_my_data(dataset, kwargs):
                                                     use_crossval=use_crossval,
                                                     variance=variance)
         predicted /= divider
+        print(predicted.shape, mask.shape)
+        # If we upsample, the mask does not match anymore, so we also resample it
+        if upsample:
+            mask = resize(mask, predicted.shape, order=0)
 
-        # If we upsample, the mask does not match anymore, so we just add the mean to the nonzero regions
-        # if upsample:
-        #     mask = zoom(mask, factor[:-1], order=0)
-        # print(predicted.shape, mask.shape)
+        print(predicted.shape, mask.shape)
         if center:
-            predicted[predicted > 0] += data_mean
+            predicted[mask] += data_mean
 
         # clip negatives, which could(?) happens at the borders
         predicted.clip(min=0., out=predicted)
