@@ -383,7 +383,7 @@ def harmonize_my_data(dataset, kwargs):
         print(predicted.shape, mask.shape)
         # If we upsample, the mask does not match anymore, so we also resample it
         if upsample:
-            mask = resize(mask, predicted.shape, order=0)
+            mask = resize(mask, predicted.shape[:-1], order=0)
 
         print(predicted.shape, mask.shape)
         if center:
