@@ -1,0 +1,23 @@
+os: Visual Studio 2015
+
+environment:
+  matrix:
+    - PY_MAJOR_VER: 3
+      PYTHON_ARCH: "x86_64"
+      CIBW_SKIP: "*-win32 *-manylinux_i686 cp27-*"
+
+platform:
+    - x64
+
+install:
+   - C:\\Python37-x64\\python.exe -m pip install twine cibuildwheel==1.1.0
+
+build_script:
+# Build wheels
+  - C:\\Python37-x64\\python.exe -m cibuildwheel --output-dir wheelhouse
+  - set
+
+
+artifacts:
+  - path: wheelhouse\*.whl
+    name: Wheels
