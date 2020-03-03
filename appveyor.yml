@@ -14,7 +14,7 @@ build_script:
 after_build:
   - python setup.py sdist --formats=gztar
 
-artifact:
+artifacts:
   - path: "dist\\*.tar.gz"
     name: sdist
   - path: "wheelhouse\\*.whl"
