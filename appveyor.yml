@@ -17,7 +17,6 @@ build_script:
   - C:\\Python37-x64\\python.exe -m cibuildwheel --output-dir wheelhouse
   - set
 
-
 artifacts:
   - path: wheelhouse\*.whl
     name: Wheels
