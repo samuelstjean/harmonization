@@ -25,6 +25,8 @@ ext_modules = [Extension('harmonization._glmnet',
 scripts = ['scripts/harmonization_build_dictionary',
            'scripts/harmonization_from_dictionary']
 
+setup_requires = ['numpy >= 1.15']
+
 setup(
     name='harmonization',
     version='0.1',
@@ -38,5 +40,6 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     install_requires=install_requires,
+    setup_requires=setup_requires,
     ext_modules=ext_modules,
 )
