@@ -1,5 +1,10 @@
 ## Harmonization of diffusion MRI datasets with adaptive dictionary learning
 
+~~~
+Looks like the manuscript is now accepted, but I haven't had the time to go through everything for a cleanup. 
+If it's taking too long just bug me about it so that I remember that people are waiting on it.
+~~~
+
 Coming soon : Actual instructions and example, along with the new configurations file format (one file which conatains all parameters) I am using now.
 
 In the meantime, you can check out the preprint version at https://arxiv.org/abs/1910.00272
