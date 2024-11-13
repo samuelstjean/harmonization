@@ -1,8 +1,42 @@
 [build-system]
-requires = ["numpy==1.15.4; python_version=='2.7'",
-            "numpy==1.15.4; python_version=='3.5'",
-            "numpy==1.15.4; python_version=='3.6'",
-            "numpy==1.15.4; python_version=='3.7'",
-            "numpy==1.17.3; python_version>='3.8'",
-            "setuptools>=18.0",
+requires = ["numpy>=2.0",
+            "setuptools",
             "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "harmonization"
+version = '0.1'
+authors = [{name = "Samuel St-Jean"}]
+description='Implementation of "Harmonization of diffusion MRI datasets with adaptive dictionary learning".'
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "GPLv2"}
+
+dependencies = [
+    "numpy>=1.20",
+    "scipy>=1.6",
+    "pyyaml>=5.1",
+    "nibabel>=2.4",
+    "scikit-learn>=0.21",
+    "joblib>=0.14.1",
+    "tqdm>=4.32.2",
+    "nlsam>=0.6.1"
+]
+
+[project.urls]
+homepage = "https://github.com/samuelstjean/harmonization"
+documentation = "https://harmonization.readthedocs.io/en/latest/"
+changelog = "https://github.com/samuelstjean/harmonization/blob/master/CHANGELOG.md"
+
+[tool.cibuildwheel]
+build-frontend = "build"
+skip = "pp* *musllinux*"
+archs = ["auto64"]
+manylinux-x86_64-image = "manylinux_2_28"
+test-requires = ['pytest']
+test-command = "pytest --verbose"
+
+# [tool.cibuildwheel.linux]
+# before-build
