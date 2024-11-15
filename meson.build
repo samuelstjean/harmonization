@@ -1,13 +1,30 @@
 project('_glmnet',
         ['c', 'fortran'],
-        version : '0.1',
+        version : '0.2',
         meson_version: '>= 1.2.3',
         default_options : [
                             'warning_level=1',
                             'buildtype=release'
                           ])
 
+numpy_nodepr_api = '-DNPY_NO_DEPRECATED_API=NPY_1_23_API_VERSION'
+
+python_sources = [
+    'harmonization/__init__.py',
+    'harmonization/config.py',
+    'harmonization/dictionary.py',
+    'harmonization/elastic_net.py',
+    'harmonization/recon.py',
+    'harmonization/solver.py',
+]
+
+fflags = ['-fdefault-real-8',
+          '-ffixed-form',
+          '-fPIC',
+          '-shared',
+]
 fc = meson.get_compiler('fortran')
+add_project_arguments(fflags, language: 'fortran')
 
 py = import('python').find_installation(pure: false)
 py_dep = py.dependency()
@@ -23,7 +40,8 @@ incdir_f2py = run_command(py,
 ).stdout().strip()
 
 inc_np = include_directories(incdir_numpy)
-np_dep = declare_dependency(include_directories: inc_np)
+np_dep = declare_dependency(include_directories: inc_np,
+                            compile_args: numpy_nodepr_api)
 
 incdir_f2py = incdir_numpy / '..' / '..' / 'f2py' / 'src'
 inc_f2py = include_directories(incdir_f2py)
@@ -33,8 +51,9 @@ inc_np = include_directories(incdir_numpy, incdir_f2py)
 # gh-25000
 quadmath_dep = fc.find_library('quadmath', required: false)
 
-py.extension_module('harmonization._glmnet',
+py.extension_module('_glmnet',
                      [
+                     '''glmnet/glmnet.f''',
                      '''glmnet/_glmnetmodule.c''',
                      '''glmnet/_glmnet-f2pywrappers.f''',
                      fortranobject_c
@@ -46,4 +65,11 @@ py.extension_module('harmonization._glmnet',
                      py_dep,
                      quadmath_dep,
                      ],
-                     install : true)
+                     install : true,
+                     subdir: 'harmonization')
+
+py.install_sources(
+  python_sources,
+  pure: false,             # Will be installed next to binaries
+  subdir: 'harmonization'  # Folder relative to site-packages to install to
+)

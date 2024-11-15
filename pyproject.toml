@@ -1,12 +1,13 @@
 [build-system]
 requires = ["numpy>=2.0",
             "meson-python>=0.15",
+            "ninja",
             "wheel"]
 build-backend = "mesonpy"
 
 [project]
 name = "harmonization"
-version = '0.1'
+version = '0.2'
 authors = [{name = "Samuel St-Jean"}]
 description='Implementation of "Harmonization of diffusion MRI datasets with adaptive dictionary learning".'
 readme = "README.md"
@@ -14,8 +15,8 @@ requires-python = ">=3.9"
 license = {text = "GPLv2"}
 
 dependencies = [
-    "numpy>=1.20",
-    "scipy>=1.6",
+    "numpy>=1.23",
+    "scipy>=1.8",
     "pyyaml>=5.1",
     "nibabel>=2.4",
     "scikit-learn>=0.21",
@@ -23,6 +24,10 @@ dependencies = [
     "tqdm>=4.32.2",
     "nlsam>=0.6.1"
 ]
+
+[project.scripts]
+harmonization_harmonize_my_data = "harmonization.scripts:main_harmonize_my_data"
+harmonization_get_global_D = "harmonization.scripts:main_get_global_D"
 
 [project.urls]
 homepage = "https://github.com/samuelstjean/harmonization"
@@ -35,7 +40,7 @@ skip = "pp* *musllinux*"
 archs = ["auto64"]
 manylinux-x86_64-image = "manylinux_2_28"
 test-requires = ['pytest']
-test-command = "pytest --verbose"
+test-command = "pytest --verbose {project}"
 
 # [tool.cibuildwheel.linux]
 # before-build

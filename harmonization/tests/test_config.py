@@ -5,12 +5,14 @@ from harmonization.config import write_config, read_config, get_filenames
 
 folder = tempfile.gettempdir()
 file = 'temp_write.yaml'
+filepath = os.path.join(folder, file)
 
 def test_write_config():
-    write_config(os.path.join(folder, file))
+    write_config(filepath)
+    assert os.path.isfile(filepath)
 
 def test_read_config():
-    read_config(os.path.join(folder, file))
+    read_config(filepath)
 
 def test_get_filenames():
     path = os.path.dirname(os.path.realpath(__file__))
