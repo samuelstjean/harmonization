@@ -4,7 +4,7 @@
 # Remember that absolute or relative paths are both valid
 path: harmonization/tests/datasets
 outpath: harmonization/tests/datasets/harmonized_data # put the same folder to save the data besides the original
-outfilename: harmonization/tests/datasets/dictionary.npy # the harmonized nifti files will share this filename
+outfilename: harmonization/tests/datasets/upscale.npy # the harmonized nifti files will share this filename
 
 # If an output dataset already exists, we do not overwrite it by default
 overwrite: True
@@ -24,7 +24,7 @@ bvec: dwi.bvecs
 maskname: dwi_brain_mask.nii.gz
 
 block_size: 2, 2, 2, 5
-block_up: 2, 2, 2, 5
+block_up: 3, 3, 3, 5
 use_std: False
 positivity_D: False
 positivity_recon: True
