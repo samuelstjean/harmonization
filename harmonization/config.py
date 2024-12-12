@@ -1,5 +1,3 @@
-from __future__ import print_function, division
-
 import os
 import yaml
 
@@ -10,18 +8,23 @@ from glob import iglob
 default_config = """
 # Paths can be relative or absolute, but the root needs to already be created
 # Any subfolder (i.e. each subject has its own folder) will be created accordingly
+# You *need* to edit the first two lines to specify where your data files are and where the results wil be output
 path: /root/path/to/all/my/data
 outpath: /output/path/to//my/new/data
 outfilename: harmonization_dictionary.npy
 
+# If an output dataset already exists, we do not overwrite it by default
+overwrite: False
+
 # If globbing is allowed, a star expression needs to be a quoted string or it crashes the reader
+# See https://en.wikipedia.org/wiki/Glob_(programming) for more info
 glob: True
-dataname: '*_.nii.gz'
+dataname: '*.nii.gz'
 
 # If we glob, the extension of dataname is replaced to create the filenames of the remaining files
 # If not, the filename needs to be supplied and will be loaded from the same folder as the data
-bval: .bval
-bvec: .bvec
+bval: _bval
+bvec: _bvec
 maskname: _brain_mask.nii.gz
 
 block_size: 3, 3, 3, 5
@@ -69,20 +72,28 @@ def get_filenames(path, use_glob, kwargs):
 
     # Build the list of all datasets and supporting files
     if use_glob:
-        files = os.path.join(path, kwargs['dataname'])
-        for name in iglob(files):
+        files = os.path.join(path, '**/', kwargs['dataname'])
+        for name in iglob(files, recursive=True):
             dataset = {'data': name,
+                       'folder': None,
                        'mask': name.replace(kwargs['ext'], kwargs['maskname']),
                        'bval': name.replace(kwargs['ext'], kwargs['bval']),
                        'bvec': name.replace(kwargs['ext'], kwargs['bvec'])}
 
             datasets += [dataset]
     else:
-        for root, dirs, files in os.walk(path):
-            dirs.sort()
+        paths = list(os.walk(path))
+
+        if len(paths) == 0:
+            topdir = paths[0]
+        else:
+            topdir = paths[0][0]
+
+        for root, dirs, files in paths:
             for name in files:
                 if name == kwargs['dataname']:
                     dataset = {'data': os.path.join(root, kwargs['dataname']),
+                               'folder': os.path.relpath(root, start=topdir),
                                'mask': os.path.join(root, kwargs['maskname']),
                                'bval': os.path.join(root, kwargs['bval']),
                                'bvec': os.path.join(root, kwargs['bvec'])}
@@ -90,6 +101,7 @@ def get_filenames(path, use_glob, kwargs):
                     datasets += [dataset]
 
     if len(datasets) == 0:
-        raise ValueError('No datasets found with the given config file at {}'.format(path))
+        error = f'No datasets found with the given config file at {os.path.realpath(path)}'
+        raise ValueError(error)
 
     return datasets

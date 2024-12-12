@@ -24,7 +24,8 @@ def main_get_global_D():
         else:
             error = f'You need to pass the keyword "write" as an argument followed by a filename to write the default config, but you passed {sys.argv[1:]}'
             raise ValueError(error)
-    else:
+
+    if len(sys.argv) != 2:
         error = f'The only accepted argument is a config.yaml file, but you passed {sys.argv[1:]}'
         raise ValueError(error)
 

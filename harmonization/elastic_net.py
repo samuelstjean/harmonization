@@ -1,5 +1,3 @@
-from __future__ import print_function, division
-
 import numpy as np
 import warnings
 
@@ -142,7 +140,7 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None, variance=No
     df_mu = np.sum(beta != 0, axis=0, dtype=np.float32)
 
     # criterion from burnham and anderson
-    criterion_value = n * np.log(mse) + w * df_mu
+    criterion_value = np.array(n * np.log(mse) + w * df_mu, dtype=np.float64)
 
     # criterion according to 2.15 and 2.16 of https://projecteuclid.org/download/pdfview_1/euclid.aos/1194461726
     # if variance is None:
@@ -162,8 +160,8 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None, variance=No
     # so we copy everything once to not keep references to it during the parallel processing
     # or whatever, computer sciency stuff, it works :/
     beta = beta[:, best_idx].copy()
-    a0 = a0[best_idx].copy()
     yhat = yhat[:, best_idx].copy()
+    a0 = a0[best_idx].copy()
     alm = alm[best_idx].copy()
 
     return beta, a0, yhat, alm

@@ -1,5 +1,3 @@
-from __future__ import print_function, division
-
 import numpy as np
 
 from itertools import product
@@ -41,9 +39,9 @@ def reconstruct_from_blocks(patches, image_size, block_size, block_up, new_overl
         p_h, p_w, p_l = patches.shape[1:-1]
 
     img = np.zeros(image_size, dtype=np.float32)
-    img = np.pad(img, [(0, p_h), (0, p_w), (0, p_l), (0, 0)], 'constant', constant_values=(0, 1))
+    img = np.pad(img, [(0, p_h), (0, p_w), (0, p_l), (0, 0)], 'constant', constant_values=(0, 0))
     div = np.full(image_size, 1e-15, dtype=np.float32)
-    div = np.pad(div, [(0, p_h), (0, p_w), (0, p_l), (0, 0)], 'constant', constant_values=(0, 1))
+    div = np.pad(div, [(0, p_h), (0, p_w), (0, p_l), (0, 0)], 'constant', constant_values=(1e-15, 1e-15))
 
     # compute the dimensions of the patches array
     n_h = i_h - p_h + 1
