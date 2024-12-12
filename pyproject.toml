@@ -1,8 +1,6 @@
 [build-system]
 requires = ["numpy>=2.0",
-            "meson-python>=0.15",
-            "ninja",
-            "wheel"]
+            "meson-python>=0.15"]
 build-backend = "mesonpy"
 
 [project]
@@ -20,9 +18,10 @@ dependencies = [
     "pyyaml>=5.1",
     "nibabel>=2.4",
     "scikit-learn>=0.21",
-    "joblib>=0.14.1",
+    "joblib>=1.3",
     "tqdm>=4.32.2",
-    "nlsam>=0.6.1"
+    "nlsam>=0.7",
+    "autodmri>=0.2.7"
 ]
 
 [project.scripts]
@@ -41,6 +40,4 @@ archs = ["auto64"]
 manylinux-x86_64-image = "manylinux_2_28"
 test-requires = ['pytest']
 test-command = "pytest --verbose {project}"
-
-# [tool.cibuildwheel.linux]
-# before-build
+before-all = "pip config set install.prefer-binary true"

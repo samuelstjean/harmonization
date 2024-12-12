@@ -15,12 +15,16 @@ python_sources = [
     'harmonization/dictionary.py',
     'harmonization/elastic_net.py',
     'harmonization/recon.py',
+    'harmonization/scripts.py',
     'harmonization/solver.py',
 ]
 
 fflags = ['-fdefault-real-8',
           '-ffixed-form',
           '-fPIC',
+          '-flto',
+          '-funroll-loops',
+          '-ffast-math',
           '-shared',
 ]
 fc = meson.get_compiler('fortran')
