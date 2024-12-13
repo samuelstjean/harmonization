@@ -11,7 +11,7 @@ def main_get_global_D():
     if len(sys.argv) == 1:
         usage = 'Everything is set in config.yaml, that is the only input.\nTo create a default config, pass "write /path/to/file/config.yaml" to create a template example'
         print(usage)
-        sys.exit(1)
+        sys.exit(0)
 
     config = sys.argv[1]
 
@@ -20,7 +20,7 @@ def main_get_global_D():
         if config == 'write':
             write_config(path)
             print(f'Default config written at {os.path.abspath(path)}')
-            sys.exit(1)
+            sys.exit(0)
         else:
             error = f'You need to pass the keyword "write" as an argument followed by a filename to write the default config, but you passed {sys.argv[1:]}'
             raise ValueError(error)
@@ -48,7 +48,7 @@ def main_harmonize_my_data():
     if len(sys.argv) == 1:
         usage = 'Everything is set in "config.yaml" and is the only accepted input.'
         print(usage)
-        sys.exit(1)
+        sys.exit(0)
 
     if len(sys.argv) != 2:
         error = f'The only accepted argument is a "config.yaml" file, but you passed {sys.argv[1:]}'

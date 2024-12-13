@@ -2,9 +2,9 @@
 # Any subfolder (i.e. each subject has its own folder) will be created accordingly
 # You *need* to edit the first two lines to specify where your data files are and where the results will be output
 # Remember that absolute or relative paths are both valid
-path: harmonization/tests/datasets
-outpath: harmonization/tests/datasets/harmonized_data # put the same folder to save the data besides the original
-outfilename: harmonization/tests/datasets/upscale.npy # the harmonized nifti files will share this filename
+path: datasets
+outpath: datasets/harmonized_data # put the same folder to save the data besides the original
+outfilename: datasets/upscale.npy # the harmonized nifti files will share this filename
 
 # If an output dataset already exists, we do not overwrite it by default
 overwrite: True

@@ -39,8 +39,9 @@ skip = "pp* *musllinux*"
 archs = ["auto64"]
 manylinux-x86_64-image = "manylinux_2_28"
 test-requires = ['pytest']
+build = 'cp310*'
 
-test-command = "cd {project} && pytest harmonization"
+test-command = "pytest --pyargs harmonization"
 before-all = "pip config set install.prefer-binary true"
 
 [tool.cibuildwheel.windows]
