@@ -39,5 +39,10 @@ skip = "pp* *musllinux*"
 archs = ["auto64"]
 manylinux-x86_64-image = "manylinux_2_28"
 test-requires = ['pytest']
-test-command = "pytest --verbose {project}"
+
+test-command = "cd {project} && pytest harmonization"
 before-all = "pip config set install.prefer-binary true"
+
+[tool.cibuildwheel.windows]
+before-build = "pip install delvewheel"
+repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"

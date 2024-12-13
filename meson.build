@@ -19,14 +19,31 @@ python_sources = [
     'harmonization/solver.py',
 ]
 
+# test_sources = [
+#   'harmonization/tests/test_config.py',
+#   'harmonization/tests/test_scripts.py',
+#   'harmonization/tests/datasets/config.yaml',
+#   'harmonization/tests/datasets/config_upscale.yaml',
+#   'harmonization/tests/datasets/subj1/dwi.nii.gz',
+#   'harmonization/tests/datasets/subj1/dwi_brain_mask.nii.gz',
+#   'harmonization/tests/datasets/subj1/dwi.bvals',
+#   'harmonization/tests/datasets/subj1/dwi.bvecs',
+#   'harmonization/tests/datasets/subj2/dwi.nii.gz',
+#   'harmonization/tests/datasets/subj2/dwi_brain_mask.nii.gz',
+#   'harmonization/tests/datasets/subj2/dwi.bvals',
+#   'harmonization/tests/datasets/subj2/dwi.bvecs',
+# ]
+
 fflags = ['-fdefault-real-8',
           '-ffixed-form',
           '-fPIC',
           '-flto',
+          '-O2',
           '-funroll-loops',
           '-ffast-math',
           '-shared',
 ]
+
 fc = meson.get_compiler('fortran')
 add_project_arguments(fflags, language: 'fortran')
 
@@ -77,3 +94,10 @@ py.install_sources(
   pure: false,             # Will be installed next to binaries
   subdir: 'harmonization'  # Folder relative to site-packages to install to
 )
+
+# py.install_sources(
+#   test_sources,
+#   pure: false,             # Will be installed next to binaries
+#   # subdir: 'harmonization/tests',  # Folder relative to site-packages to install to
+#   preserve_path: true
+# )

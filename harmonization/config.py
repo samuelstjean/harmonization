@@ -1,7 +1,7 @@
 import os
 import yaml
 
-from glob import iglob
+from glob import glob
 
 
 # This huge string is dumped directly to a text file, creating the default config as is
@@ -73,7 +73,7 @@ def get_filenames(path, use_glob, kwargs):
     # Build the list of all datasets and supporting files
     if use_glob:
         files = os.path.join(path, '**/', kwargs['dataname'])
-        for name in iglob(files, recursive=True):
+        for name in sorted(glob(files, recursive=True)):
             dataset = {'data': name,
                        'folder': None,
                        'mask': name.replace(kwargs['ext'], kwargs['maskname']),
