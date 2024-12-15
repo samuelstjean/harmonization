@@ -32,6 +32,16 @@ test_sources = [
   'harmonization/tests/datasets/subj2/dwi_brain_mask.nii.gz',
   'harmonization/tests/datasets/subj2/dwi.bvals',
   'harmonization/tests/datasets/subj2/dwi.bvecs',
+  'harmonization/tests/datasets_bids/config_bids.yaml',
+  'harmonization/tests/datasets_bids/config_upscale_bids.yaml',
+  'harmonization/tests/datasets_bids/subj1-bids/dwi/subj1-dwi.nii.gz',
+  'harmonization/tests/datasets_bids/subj1-bids/dwi/subj1-dwi_brain_mask.nii.gz',
+  'harmonization/tests/datasets_bids/subj1-bids/dwi/subj1-dwi.bvals',
+  'harmonization/tests/datasets_bids/subj1-bids/dwi/subj1-dwi.bvecs',
+  'harmonization/tests/datasets_bids/subj2-bids/dwi/subj2-dwi.nii.gz',
+  'harmonization/tests/datasets_bids/subj2-bids/dwi/subj2-dwi_brain_mask.nii.gz',
+  'harmonization/tests/datasets_bids/subj2-bids/dwi/subj2-dwi.bvals',
+  'harmonization/tests/datasets_bids/subj2-bids/dwi/subj2-dwi.bvecs',
 ]
 
 fflags = ['-fdefault-real-8',

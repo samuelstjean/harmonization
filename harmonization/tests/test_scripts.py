@@ -7,10 +7,16 @@ from pathlib import Path
 cwd =  Path(__file__).parents[0]
 
 filename = Path('datasets') / 'config.yaml'
-filename_upscale = Path('datasets') /'config_upscale.yaml'
+filename_bids = Path('datasets_bids') / 'config_bids.yaml'
+filename_upscale = Path('datasets') / 'config_upscale.yaml'
+filename_upscale_bids = Path('datasets_bids') / 'config_upscale_bids.yaml'
 temppath = Path(tempfile.gettempdir()) / 'tester.yaml'
 
-files = [filename, filename_upscale]
+files = [filename,
+         filename_bids,
+         filename_upscale,
+         filename_upscale_bids]
+
 commands = ['harmonization_harmonize_my_data',
             'harmonization_get_global_D',
             ('harmonization_get_global_D', 'write', temppath)]
