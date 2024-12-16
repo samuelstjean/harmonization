@@ -4,7 +4,7 @@ requires = ["numpy>=2.0",
 build-backend = "mesonpy"
 
 [project]
-name = "harmonization"
+name = "dmri-harmonization"
 version = '0.2'
 authors = [{name = "Samuel St-Jean"}]
 description='Implementation of "Harmonization of diffusion MRI datasets with adaptive dictionary learning".'
@@ -30,7 +30,6 @@ harmonization_get_global_D = "harmonization.scripts:main_get_global_D"
 
 [project.urls]
 homepage = "https://github.com/samuelstjean/harmonization"
-documentation = "https://harmonization.readthedocs.io/en/latest/"
 changelog = "https://github.com/samuelstjean/harmonization/blob/master/CHANGELOG.md"
 
 [tool.cibuildwheel]
