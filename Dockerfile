@@ -21,4 +21,4 @@ RUN pip3 install --no-cache-dir $DEPENDS && \
     pip3 install --no-cache-dir .
 
 # default command to run
-CMD ["/bin/bash"]
+ENTRYPOINT ["/bin/bash"]

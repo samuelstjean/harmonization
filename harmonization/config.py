@@ -8,7 +8,8 @@ from glob import glob
 default_config = """
 # Paths can be relative or absolute, but the root needs to already be created
 # Any subfolder (i.e. each subject has its own folder) will be created accordingly
-# You *need* to edit the first two lines to specify where your data files are and where the results wil be output
+# You *need* to edit the first two lines to specify where your data files are and where the results will be output
+# Remember that absolute or relative paths are both valid
 path: /root/path/to/all/my/data
 outpath: /output/path/to//my/new/data
 outfilename: harmonization_dictionary.npy
@@ -18,6 +19,7 @@ overwrite: False
 
 # If globbing is allowed, a star expression needs to be a quoted string or it crashes the reader
 # See https://en.wikipedia.org/wiki/Glob_(programming) for more info
+# or the examples config.yaml files in the harmonization/tests/datasets folder
 glob: True
 dataname: '*.nii.gz'
 
@@ -46,8 +48,7 @@ niter: 1500
 nlambdas: 100
 
 # ncores can be a positive or negative number, which indicates the number of cores to use or to leave free respectively.
-# ncores = -1 will use all cores
-ncores: -1
+ncores: -1 # -1 will use all cores
 """
 
 
