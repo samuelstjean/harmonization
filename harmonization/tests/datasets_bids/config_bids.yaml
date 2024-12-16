@@ -1,0 +1,45 @@
+# Paths can be relative or absolute, but the root needs to already be created
+# Any subfolder (i.e. each subject has its own folder) will be created accordingly
+# You *need* to edit the first two lines to specify where your data files are and where the results will be output
+# Remember that absolute or relative paths are both valid
+path: datasets_bids
+outpath: datasets_bids/harmonized_data # put the same folder to save the data besides the original
+outfilename: datasets_bids/dictionary.npy # the harmonized nifti files will share this filename
+
+# If an output dataset already exists, we do not overwrite it by default
+overwrite: True
+
+# If globbing is allowed, a star expression needs to be a quoted string or it crashes the reader
+# See https://en.wikipedia.org/wiki/Glob_(programming) for more info
+
+# In this example, we use a folder structure where all files have the same name
+# Each folder contains one subject, this is what is used by the HCP and the BIDS format
+glob: True
+dataname: "*-dwi.nii.gz"
+
+# If we glob, the extension of dataname is replaced to create the filenames of the remaining files
+# If not, the filename needs to be supplied and will be loaded from the same folder as the data
+bval: .bvals
+bvec: .bvecs
+maskname: _brain_mask.nii.gz
+
+block_size: 2, 2, 2, 5
+block_up: 2, 2, 2, 5
+use_std: False
+positivity_D: False
+positivity_recon: True
+fit_intercept: True
+center: True
+
+# bias_correct_std: False
+fix_mean: False
+use_crossval: False
+
+split_b0s: True
+b0_threshold: 20
+batchsize: 64
+niter: 150
+nlambdas: 100
+
+# ncores can be a positive or negative number, which indicates the number of cores to use or to leave free respectively.
+ncores: -1 # -1 will use all cores

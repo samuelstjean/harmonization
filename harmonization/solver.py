@@ -7,19 +7,19 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 
 from sklearn.utils import gen_batches
-from harmonization.enet import lasso_path, lasso_crossval
+from harmonization.elastic_net import lasso_path, lasso_crossval
 
 
 def update_D(D, A, B, X, niter=1, eps=1e-15, positivity=False):
 
     u = np.zeros(D.shape)
     norm2 = np.zeros(D.shape[1])
-    to_purge = np.zeros(D.shape[1], dtype=np.bool)
+    to_purge = np.zeros(D.shape[1], dtype=bool)
 
     for _ in range(niter):
         # divide by zeros are replaced by 0, but still raise the warning, so we squelch it
         with np.errstate(divide='ignore', invalid='ignore'):
-            u[:] = np.where(np.diag(A) != 0, (B - np.dot(D, A))/np.diag(A) + D, 0)
+            u[:] = np.where(np.diag(A) != 0, (B - np.dot(D, A)) / np.diag(A) + D, 0)
 
         norm2[:] = np.sqrt(np.sum(u**2, axis=0))
 
@@ -31,26 +31,36 @@ def update_D(D, A, B, X, niter=1, eps=1e-15, positivity=False):
             u[:, to_purge] = X[indices].reshape(np.sum(to_purge), u.shape[0]).T
             norm2[to_purge] = np.sqrt(np.sum(u[:, to_purge]**2, axis=0))
 
-        D[:] = u / np.maximum(1., norm2)
+        D[:] = u / np.maximum(1, norm2)
 
         if positivity:
-            D.clip(min=0., out=D)
+            D[D < 0] = 0
 
-
-def lasso_path_parallel(D, X, nlambdas, positivity=False, variance=None, fit_intercept=True, standardize=True, use_crossval=False, n_splits=3):
+def lasso_path_parallel(D, X, nlambdas, positivity=False, variance=None, fit_intercept=True, standardize=True, use_crossval=False):
+    N = X.shape[0]
+    alpha = np.zeros((N, D.shape[1]), dtype=np.float32)
+    intercept = np.zeros(N, dtype=np.float32)
+    Xhat = np.zeros((N, D.shape[0]), dtype=np.float32)
+    lbda = np.zeros(N, dtype=np.float32)
 
     if use_crossval:
-        Xhat, alpha, intercept, lbda = lasso_crossval(D, X, nlam=nlambdas, fit_intercept=fit_intercept, n_splits=n_splits,
-                                                      pos=positivity, standardize=standardize, penalty=None)
-    else:
-        alpha, intercept, Xhat, lbda = lasso_path(D, X, nlam=nlambdas, fit_intercept=fit_intercept, criterion='aic',
-                                                  pos=positivity, standardize=standardize, penalty=None)
+        # use_crossval holds the number of split, if not we default to 3 because reasons
+        if use_crossval == 1:
+            n_splits = 3
+        else:
+            n_splits = use_crossval
 
+        Xhat[i], alpha[i], intercept[i], lbda[i] = lasso_crossval(D, X[i], nlam=nlambdas, fit_intercept=fit_intercept, n_splits=n_splits,
+                                                                  pos=positivity, standardize=standardize, penalty=None)
+    else:
+        for i in range(N):
+            alpha[i], intercept[i], Xhat[i], lbda[i] = lasso_path(D, X[i], nlam=nlambdas, fit_intercept=fit_intercept, criterion='aicc',
+                                                                  pos=positivity, standardize=standardize, penalty=None)
     return Xhat, alpha, intercept, lbda
 
 
 def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positivity=False, variance=None, fit_intercept=True, standardize=True,
-             progressbar=True, pool=None, use_joblib=False, use_crossval=False, verbose=5, pre_dispatch='all'):
+             progressbar=True, use_joblib=False, use_crossval=False, verbose=5):
 
     if alpha is None:
         return_alpha = True
@@ -65,22 +75,37 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
     intercept = np.zeros((alpha.shape[1], 1), dtype=np.float32)
     lbda = np.zeros((alpha.shape[1], 1), dtype=np.float32)
 
+    step = 10
+    arglist = ((D,
+                X[i:i+step],
+                nlambdas,
+                positivity,
+                variance[i:i+step],
+                fit_intercept,
+                standardize,
+                use_crossval) for i in range(0, alpha.shape[1], step))
+
+    plauncher = Parallel(return_as='generator',
+                         pre_dispatch='all',
+                         backend='loky',
+                         n_jobs=ncores)
+
     if use_joblib:
-        stuff = Parallel(n_jobs=ncores,
-                         pre_dispatch=pre_dispatch,
-                         verbose=verbose)(delayed(lasso_path_parallel)(D,
-                                                                       X[i],
-                                                                       nlambdas=nlambdas,
-                                                                       positivity=positivity,
-                                                                       variance=variance[i],
-                                                                       fit_intercept=fit_intercept,
-                                                                       standardize=standardize,
-                                                                       use_crossval=use_crossval) for i in range(alpha.shape[1]))
+        stuff = plauncher(delayed(lasso_path_parallel)(*args) for args in arglist)
+
+        if progressbar:
+            stuff = tqdm(stuff, total=X.shape[0]//step+1)
     else:
         raise ValueError('Only joblib path is supported now.')
 
     for i, content in enumerate(stuff):
-        Xhat[i], alpha[:, i], intercept[i], lbda[i] = content
+        slicer = np.index_exp[i * step:(i+1) * step]
+        slicer2d = np.index_exp[:, i * step:(i+1) * step]
+
+        Xhat[slicer], temp_alpha, temp_intercept, temp_lbda = content
+        alpha[slicer2d] = temp_alpha.T
+        intercept[slicer] = temp_intercept[:, None]
+        lbda[slicer] = temp_lbda[:, None]
 
     if return_all:
         return Xhat, alpha, intercept, lbda
@@ -89,10 +114,9 @@ def solve_l1(X, D, alpha=None, return_all=False, nlambdas=100, ncores=-1, positi
         return alpha
 
 
-def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3, variance=None,
+def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1.0, t0=1e-3, variance=None,
               shuffle=True, fulldraw=False, positivity=False, fit_intercept=True, standardize=True, ncores=-1, nlambdas=100,
-              progressbar=True, disable_mkl=True, saveback=None, use_joblib=False, method='fork',
-              eps=1e-6):
+              progressbar=True, use_joblib=True, eps=1e-6):
 
     tt = time()
     seen_patches = 0
@@ -143,11 +167,11 @@ def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3
 
         x[:] = X[batch].reshape(batchsize, -1)
         _, _, _, lbda = solve_l1(x, D, alpha, positivity=positivity, ncores=ncores, nlambdas=nlambdas, variance=variance, return_all=True,
-                                 fit_intercept=fit_intercept, standardize=standardize, use_joblib=use_joblib, method=method,
-                                 progressbar=progressbar)
+                                 fit_intercept=fit_intercept, standardize=standardize, use_joblib=use_joblib, progressbar=False, verbose=False)
 
         np.dot(alpha, alpha.T, out=alpha_alpha_T)
-        np.dot(x.T, alpha.T, out=x_alpha_T)  # x is transposed with regards to original notation
+        # x is transposed with regards to original notation
+        np.dot(x.T, alpha.T, out=x_alpha_T)
 
         beta = (1 - (1 / t))**rho
 
@@ -175,5 +199,5 @@ def online_DL(X, D=None, n_atoms=None, niter=250, batchsize=128, rho=1., t0=1e-3
         else:
             seen_patches += batchsize
 
-    print('total {}'.format(time() - tt))
+    print(f'total time: {round((time() - tt) / 60, 2)} mins')
     return D

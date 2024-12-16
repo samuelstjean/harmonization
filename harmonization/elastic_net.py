@@ -1,12 +1,79 @@
 import numpy as np
-
 import warnings
-from harmonization._glmnet import elnet
 
 from sklearn.model_selection import KFold
+from harmonization._glmnet import elnet
 
 
-def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
+def lasso_path(X, y, nlam=100, fit_intercept=False, pos=False, standardize=False, weights=None, penalty=None, criterion=None):
+    """return full path for Lasso"""
+    return elastic_net_path(X, y, rho=1.0, nlam=nlam, weights=weights, penalty=penalty, criterion=criterion,
+                            fit_intercept=fit_intercept, pos=pos, standardize=standardize)
+
+
+def lasso_crossval(X, y, nlam=100, fit_intercept=False, pos=False, standardize=False,
+                   weights=None, penalty=None, n_splits=3, use_min_se=True):
+    """return k-fold cross validation for Lasso"""
+
+    # In this call we find a list of lambda values
+    # we then crossval using those same values on different splits down later.
+    lmu, a0, ca, ia, nin, rsq, alm, nlp, jerr = elastic_net(X,
+                                                            y,
+                                                            1.,
+                                                            nlam=nlam,
+                                                            fit_intercept=fit_intercept,
+                                                            pos=pos,
+                                                            weights=weights,
+                                                            vp=penalty,
+                                                            standardize=standardize)
+    alm = alm[:lmu]
+    cv_error = np.zeros((n_splits, lmu))
+
+    for idx, (train_idx, test_idx) in enumerate(KFold(n_splits=n_splits, shuffle=True).split(X)):
+        beta, a0, _, _ = elastic_net_path(X[train_idx],
+                                          y[train_idx],
+                                          rho=1.0,
+                                          ulam=alm,
+                                          nlam=lmu,
+                                          penalty=penalty,
+                                          fit_intercept=fit_intercept,
+                                          pos=pos,
+                                          standardize=standardize)
+
+        y_pred = np.dot(X[test_idx], beta) + a0
+        error = np.mean((y[test_idx, None] - y_pred)**2, axis=0)
+        # seems like the lambda sequence can sometimes be truncated somehow?
+        cv_error[idx, :len(error)] = error
+
+    mean_cv = np.mean(cv_error, axis=0)
+    best_idx = np.argmin(mean_cv)
+
+    use_min_se = False
+    if use_min_se:
+        std_cv = np.std(cv_error, axis=0, ddof=1)
+        semin = mean_cv[best_idx] + std_cv[best_idx]
+
+        # we want the smallest cv + std_cv as the new model instead of just the smallest one
+        # that's the length of the vector where everything is below the upper bound on cv
+        best_idx = np.sum(mean_cv <= semin)
+
+    best_lambda = alm[best_idx]
+
+    # redo a full fit with the best lambda value we found
+    beta_best, a0_best, Xhat_best, alm_best = elastic_net_path(X,
+                                                               y,
+                                                               rho=1.0,
+                                                               ulam=best_lambda,
+                                                               nlam=1,
+                                                               penalty=penalty,
+                                                               fit_intercept=fit_intercept,
+                                                               pos=pos,
+                                                               standardize=standardize)
+
+    return Xhat_best.squeeze(), beta_best.squeeze(), a0_best, alm_best
+
+
+def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None, variance=None,
                      fit_intercept=False, pos=False, standardize=False, weights=None, penalty=None):
     """return full path for ElasticNet"""
 
@@ -52,7 +119,7 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
 
     yhat = np.dot(X, beta) + a0
 
-    # no criterion- just return the whole path
+    # no criterion - just return the whole path
     # else we choose the best value of lambda and just return that
     if criterion is None:
         return beta, a0, yhat, alm
@@ -69,16 +136,16 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
     else:
         raise ValueError('Criterion {} is not supported!'.format(criterion))
 
-    squared_error = (y[..., None] - yhat)**2
-    mse = np.mean(squared_error, axis=0, dtype=np.float32)
+    mse = np.mean((y[:, None] - yhat)**2, axis=0, dtype=np.float32)
     df_mu = np.sum(beta != 0, axis=0, dtype=np.float32)
 
-    # criterion according to 2.15 and 2.16 of https://projecteuclid.org/download/pdfview_1/euclid.aos/1194461726
-    variance = None
-    if variance is None:
-        variance = np.var(y)
+    # criterion from burnham and anderson
+    criterion_value = np.array(n * np.log(mse) + w * df_mu, dtype=np.float64)
 
-    criterion_value = n * np.log(mse) + w * df_mu
+    # criterion according to 2.15 and 2.16 of https://projecteuclid.org/download/pdfview_1/euclid.aos/1194461726
+    # if variance is None:
+    #     variance = np.var(y)
+    # criterion_value = mse / variance + w * df_mu / n
 
     if criterion == 'aicc':
         with np.errstate(divide='ignore'):
@@ -89,13 +156,15 @@ def elastic_net_path(X, y, rho, nlam=100, ulam=None, criterion=None,
     criterion_value[np.isnan(criterion_value)] = 1e300
     best_idx = np.argmin(criterion_value, axis=0)
 
-    return beta[:, best_idx], a0[best_idx], yhat[:, best_idx], alm[best_idx]
+    # Seems like the memory is not correctly freed internally when we call from fortran,
+    # so we copy everything once to not keep references to it during the parallel processing
+    # or whatever, computer sciency stuff, it works :/
+    beta = beta[:, best_idx].copy()
+    yhat = yhat[:, best_idx].copy()
+    a0 = a0[best_idx].copy()
+    alm = alm[best_idx].copy()
 
-
-def lasso_path(X, y, nlam=100, fit_intercept=False, pos=False, standardize=False, weights=None, penalty=None, criterion=None):
-    """return full path for Lasso"""
-    return elastic_net_path(X, y, rho=1.0, nlam=nlam, weights=weights, penalty=penalty, criterion=criterion,
-                            fit_intercept=fit_intercept, pos=pos, standardize=standardize)
+    return beta, a0, yhat, alm
 
 
 def elastic_net(X, y, rho, pos=False, thr=1e-7, weights=None, vp=None, copy=True, ulam=None, jd=np.zeros(1),
@@ -170,65 +239,3 @@ def elastic_net(X, y, rho, pos=False, thr=1e-7, weights=None, vp=None, copy=True
         raise ValueError('y needs to be 1D but is {}'.format(y.ndim))
 
     return lmu, a0, ca, ia, nin, rsq, alm, nlp, jerr
-
-
-def lasso_crossval(X, y, nlam=100, fit_intercept=False, pos=False, standardize=False,
-                   weights=None, penalty=None, n_splits=3, use_min_se=True):
-    """return k-fold cross validation for Lasso"""
-
-    # In this call we find a list of lambda values
-    # we then crossval using those same values on different splits down later.
-    lmu, a0, ca, ia, nin, rsq, alm, nlp, jerr = elastic_net(X,
-                                                            y,
-                                                            1.,
-                                                            nlam=nlam,
-                                                            fit_intercept=fit_intercept,
-                                                            pos=pos,
-                                                            weights=weights,
-                                                            vp=penalty,
-                                                            standardize=standardize)
-    alm = alm[:lmu]
-    cv_error = np.zeros((n_splits, lmu))
-
-    for idx, (train_idx, test_idx) in enumerate(KFold(n_splits=n_splits, shuffle=True).split(X)):
-        beta, a0, _, _ = elastic_net_path(X[train_idx],
-                                          y[train_idx],
-                                          rho=1.0,
-                                          ulam=alm,
-                                          nlam=lmu,
-                                          penalty=penalty,
-                                          fit_intercept=fit_intercept,
-                                          pos=pos,
-                                          standardize=standardize)
-
-        y_pred = np.dot(X[test_idx], beta) + a0
-        error = np.mean((y[test_idx, None] - y_pred)**2, axis=0)
-        # seems like the lambda sequence can sometimes be truncated somehow?
-        cv_error[idx, :len(error)] = error
-
-    mean_cv = np.mean(cv_error, axis=0)
-    best_idx = np.argmin(mean_cv)
-
-    use_min_se = False
-    if use_min_se:
-        std_cv = np.std(cv_error, axis=0, ddof=1)
-        semin = mean_cv[best_idx] + std_cv[best_idx]
-
-        # we want the smallest cv + std_cv as the new model instead of just the smallest one
-        # that's the length of the vector where everything is below the upper bound on cv
-        best_idx = np.sum(mean_cv <= semin)
-
-    best_lambda = alm[best_idx]
-
-    # redo a full fit with the best lambda value we found
-    beta_best, a0_best, Xhat_best, alm_best = elastic_net_path(X,
-                                                               y,
-                                                               rho=1.0,
-                                                               ulam=best_lambda,
-                                                               nlam=1,
-                                                               penalty=penalty,
-                                                               fit_intercept=fit_intercept,
-                                                               pos=pos,
-                                                               standardize=standardize)
-
-    return Xhat_best.squeeze(), beta_best.squeeze(), a0_best, alm_best
