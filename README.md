@@ -2,7 +2,15 @@
 
 For details on the algorithm, you can check out the [published version](https://onlinelibrary.wiley.com/doi/10.1002/hbm.25117)
 
+> St-Jean S, Viergever MA, Leemans A.
+> Harmonization of diffusion MRI data sets with adaptive dictionary learning.
+> Hum Brain Mapp. 2020; 41: 4478–4499. https://doi.org/10.1002/hbm.25117
+
 The manuscript detailing the original harmonization challenge which lead to this algorithm is also available from the publisher [here](https://www.sciencedirect.com/science/article/pii/S1053811919300837).
+
+> Tax, C. M. W., Grussu, F., Kaden, E., Ning, L., Rudrapatna, U., John Evans, C., St-Jean, S., Leemans, A., Koppers, S., Merhof, D., Ghosh, A., Tanno, R., Alexander, D. C., Zappalà, S., Charron, C., Kusmia, S., Linden, D. EJ., Jones, D. K., & Veraart, J.
+> (2019). Cross-scanner and cross-protocol diffusion MRI data harmonisation: A benchmark database and evaluation of algorithms.
+> NeuroImage, 195, 285–299. https://doi.org/10.1016/j.neuroimage.2019.01.077
 
 ## How to install
 
