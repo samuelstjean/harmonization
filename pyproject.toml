@@ -33,7 +33,7 @@ homepage = "https://github.com/samuelstjean/harmonization"
 changelog = "https://github.com/samuelstjean/harmonization/blob/master/CHANGELOG.md"
 
 [tool.cibuildwheel]
-skip = "*musllinux*"
+skip = ["*musllinux*", "cp3??t-*"]
 archs = ["auto64"]
 test-requires = ['pytest']
 
