@@ -5,7 +5,7 @@ build-backend = "mesonpy"
 
 [project]
 name = "dmri-harmonization"
-version = '0.2.1'
+dynamic = ['version']
 authors = [{name = "Samuel St-Jean"}]
 description='Implementation of "Harmonization of diffusion MRI datasets with adaptive dictionary learning".'
 readme = "README.md"

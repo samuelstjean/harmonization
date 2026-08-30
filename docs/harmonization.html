@@ -1,4 +1,3 @@
-<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -21,6 +20,14 @@
             <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
                    pattern=".+" required>
 
+            <h2>Contents</h2>
+            <ul>
+  <li><a href="#harmonization-of-diffusion-mri-datasets-with-adaptive-dictionary-learning">Harmonization of diffusion MRI datasets with adaptive dictionary learning</a>
+  <ul>
+    <li><a href="#how-to-install">How to install</a></li>
+    <li><a href="#a-step-by-step-example">A step by step example</a></li>
+  </ul></li>
+</ul>
 
             <h2>Submodules</h2>
             <ul>
@@ -46,12 +53,120 @@
                     <h1 class="modulename">
 harmonization    </h1>
 
-                
+                        <div class="docstring"><h1 id="harmonization-of-diffusion-mri-datasets-with-adaptive-dictionary-learning">Harmonization of diffusion MRI datasets with adaptive dictionary learning</h1>
+
+<p>For details on the algorithm, you can check out the <a href="https://onlinelibrary.wiley.com/doi/10.1002/hbm.25117">published version</a></p>
+
+<blockquote>
+  <p>St-Jean S, Viergever MA, Leemans A.
+  Harmonization of diffusion MRI data sets with adaptive dictionary learning.
+  Hum Brain Mapp. 2020; 41: 4478–4499. <a href="https://doi.org/10.1002/hbm.25117">https://doi.org/10.1002/hbm.25117</a></p>
+</blockquote>
+
+<p>The manuscript detailing the original harmonization challenge which lead to this algorithm is also available from the publisher <a href="https://www.sciencedirect.com/science/article/pii/S1053811919300837">here</a>.</p>
+
+<blockquote>
+  <p>Tax, C. M. W., Grussu, F., Kaden, E., Ning, L., Rudrapatna, U., John Evans, C., St-Jean, S., Leemans, A., Koppers, S., Merhof, D., Ghosh, A., Tanno, R., Alexander, D. C., Zappalà, S., Charron, C., Kusmia, S., Linden, D. EJ., Jones, D. K., &amp; Veraart, J.
+  (2019). Cross-scanner and cross-protocol diffusion MRI data harmonisation: A benchmark database and evaluation of algorithms.
+  NeuroImage, 195, 285–299. <a href="https://doi.org/10.1016/j.neuroimage.2019.01.077">https://doi.org/10.1016/j.neuroimage.2019.01.077</a></p>
+</blockquote>
+
+<h2 id="how-to-install">How to install</h2>
+
+<p>To install a precompiled version, simply run <code>pip install dmri-harmonization</code>.</p>
+
+<p>Normally everything is available pre-compiled, but feel free to redo it from source on your computer cluster for example.</p>
+
+<h2 id="a-step-by-step-example">A step by step example</h2>
+
+<p>There are two main scripts to use, one to build the database and one to harmonize the datasets afterwards.</p>
+
+<p>You will most likely want you data to be organized sensibly and have the same filename for every diffusion dataset under various subjects folders, just like in the example that can be found  under the tests folder.</p>
+
+<p>This looks like this and is the format used by the BIDS standard and the HCP datasets. You do not need to follow this exactly, you just need to ensure that the filenames are somewhat consistent since everything is found internally by pattern matching and substitutions.</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>datasets/
+├──<span class="w"> </span>subj1
+│<span class="w">   </span>├──<span class="w"> </span>dwi_brain_mask.nii.gz
+│<span class="w">   </span>├──<span class="w"> </span>dwi.bvals
+│<span class="w">   </span>├──<span class="w"> </span>dwi.bvecs
+│<span class="w">   </span>└──<span class="w"> </span>dwi.nii.gz
+├──<span class="w"> </span>subj2
+│<span class="w">   </span>├──<span class="w"> </span>dwi_brain_mask.nii.gz
+│<span class="w">   </span>├──<span class="w"> </span>dwi.bvals
+│<span class="w">   </span>├──<span class="w"> </span>dwi.bvecs
+│<span class="w">   </span>└──<span class="w"> </span>dwi.nii.gz
+</code></pre>
+</div>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>datasets_bids/
+├──<span class="w"> </span>subj1-bids
+│<span class="w">   </span>└──<span class="w"> </span>dwi
+│<span class="w">       </span>├──<span class="w"> </span>subj1-dwi_brain_mask.nii.gz
+│<span class="w">       </span>├──<span class="w"> </span>subj1-dwi.bvals
+│<span class="w">       </span>├──<span class="w"> </span>subj1-dwi.bvecs
+│<span class="w">       </span>└──<span class="w"> </span>subj1-dwi.nii.gz
+└──<span class="w"> </span>subj2-bids
+<span class="w">    </span>└──<span class="w"> </span>dwi
+<span class="w">        </span>├──<span class="w"> </span>subj2-dwi_brain_mask.nii.gz
+<span class="w">        </span>├──<span class="w"> </span>subj2-dwi.bvals
+<span class="w">        </span>├──<span class="w"> </span>subj2-dwi.bvecs
+<span class="w">        </span>└──<span class="w"> </span>subj2-dwi.nii.gz
+</code></pre>
+</div>
+
+<h3 id="step-1">Step 1</h3>
+
+<p>First write a config file like this</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>harmonization_get_global_D<span class="w"> </span>write<span class="w"> </span>myconfig.yaml
+</code></pre>
+</div>
+
+<p>Open up this <code>myconfig.yaml</code> file and change a couple of options, namely the paths at the top to point to your datasets folder.</p>
+
+<p>You can look up the example I mentioned above for a working example, but this should get you going.
+There are a couple more options to play with, but the default should be sane.
+I'd recommend looking at the numbers of cores option at the end however if you share a compute server with other people.</p>
+
+<h3 id="step-2">Step 2</h3>
+
+<p>Once you have your config file set up, run the command (note how there is no <code>write</code> keyword anymore)</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>harmonization_get_global_D<span class="w"> </span>myconfig.yaml
+</code></pre>
+</div>
+
+<p>Everything will be read from <code>myconfig.yaml</code>, including the input and output folder.
+You'll see that all your datasets will be loaded in before processing, so you can double check the paths were set up correctly (particularly the glob option if you use BIDS with different filenames).</p>
+
+<h3 id="step-3">Step 3</h3>
+
+<p>After running step 2, you now have an output dictionary file. Now run the command</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>harmonization_harmonize_my_data<span class="w"> </span>myconfig.yaml
+</code></pre>
+</div>
+
+<p>Sit back and relax, and you should have your harmonized datasets in the folder you specified.
+Remember you can also specify the same input and output folder to have the data side by side.</p>
+
+<p>There are a few safeguards to not shoot yourself in the foot, like not overwriting datasets by default.
+On subsequent runs, be sure to change the output dictionary filename as it sets the logic for the output filenames or set the overwrite option to <code>True</code> in the config file if desired.</p>
+</div>
+
                         <input id="mod-harmonization-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-harmonization-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos">2</span></a><span class="sd">.. include:: ../README.md</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">3</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span></pre></div>
 
 

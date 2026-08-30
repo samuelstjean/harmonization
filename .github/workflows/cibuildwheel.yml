@@ -89,18 +89,11 @@ jobs:
        with:
          python-version: '3.13'
 
-     - name: Download builds
-       uses: actions/download-artifact@v7
-       with:
-          path: dist/
-          pattern: cibw-*cp313*
-          merge-multiple: true
-
      - name: Make doc
        run: |
          python -m pip install pdoc
-         python -m pip install dist/*cp313*.whl
-         pdoc harmonization/ -o docs/
+         python -m pip install -e .
+         pdoc ./harmonization/ -o docs/
 
      - uses: actions/upload-pages-artifact@v5
        with:

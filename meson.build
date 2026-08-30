@@ -1,6 +1,6 @@
 project('_glmnet',
         ['c', 'fortran'],
-        version : '0.2',
+        version : '0.2.1',
         meson_version: '>= 1.2.3',
         default_options : [
                             'warning_level=1',
