@@ -47,7 +47,7 @@ def get_global_D(datasets, outfilename, block_size, block_up, ncores=None, batch
         print(f"Now feeding dataset {filename['data']}")
 
         mask = nib.load(filename['mask']).get_fdata(caching='unchanged').astype(bool)
-        data = nib.load(filename['data']).get_fdata(caching='unchanged').astype(np.float32)
+        data = nib.load(filename['data']).get_fdata(caching='unchanged', dtype=np.float32)
         bvals = np.loadtxt(filename['bval'])
         bvecs = np.loadtxt(filename['bvec'])
 
@@ -117,7 +117,7 @@ def get_global_D(datasets, outfilename, block_size, block_up, ncores=None, batch
 
             if use_std:
                 try:
-                    variance = nib.load(filename['std']).get_data()**2 * mask
+                    variance = nib.load(filename['std']).get_fdata(caching='unchanged', dtype=np.float32)**2 * mask
                     variance = np.broadcast_to(variance[..., None], data.shape)
                     variance = extract_patches(variance, b0_block_size, overlap, flatten=False)
                     axis = tuple(range(variance.ndim//2, variance.ndim))

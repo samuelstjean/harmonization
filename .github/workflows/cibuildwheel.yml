@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-15, windows-latest]
-        pyver: ['cp310', 'cp311', 'cp312', 'cp313', 'cp314', 'cp315']
+        pyver: ['cp311', 'cp312', 'cp313', 'cp314', 'cp315']
         toolchain:
             - {compiler: gcc, version: 13}
 
@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: |
             python -m pip install ./wheelhouse/*${{matrix.pyver}}*.whl
-            python -m pip install numpy==2.0 scipy==1.8 pytest
+            python -m pip install numpy==2.0 scipy==1.17 pytest
             pytest --pyargs harmonization
 
       - uses: actions/upload-artifact@v7
@@ -109,8 +109,6 @@ jobs:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write
       contents: write
-    # upload to PyPI on every tag starting with 'v'
-    # if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
     if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
     steps:
       - name: Download builds

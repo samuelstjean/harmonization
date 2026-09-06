@@ -1,7 +1,7 @@
 import numpy as np
 
 from itertools import product
-from scipy.ndimage.interpolation import zoom
+from scipy.ndimage import zoom
 
 
 def depimp_zoom(D, block_size, block_up, order=1):
