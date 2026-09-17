@@ -18,6 +18,7 @@ To install a precompiled version, simply run `pip install dmri-harmonization`.
 
 Normally everything is available pre-compiled, but feel free to redo it from source on your computer cluster for example.
 
+There is a basic documentation available at https://samuelstjean.github.io/harmonization
 
 ## A step by step example
 
